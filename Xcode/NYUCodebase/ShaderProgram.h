@@ -11,26 +11,28 @@
 #include "Matrix.h"
 
 class ShaderProgram {
-    public:
-        ShaderProgram(const char *vertexShaderFile, const char *fragmentShaderFile);
-        ~ShaderProgram();
+public:
+    ShaderProgram(const char *vertexShaderFile, const char *fragmentShaderFile);
+    ~ShaderProgram();
     
-        void setModelMatrix(const Matrix &matrix);
-        void setProjectionMatrix(const Matrix &matrix);
-        void setViewMatrix(const Matrix &matrix);
+    void setModelMatrix(const Matrix &matrix);
+    void setProjectionMatrix(const Matrix &matrix);
+    void setViewMatrix(const Matrix &matrix);
     
-        GLuint loadShaderFromString(const std::string &shaderContents, GLenum type);
-        GLuint loadShaderFromFile(const std::string &shaderFile, GLenum type);
+    GLuint loadShaderFromString(const std::string &shaderContents, GLenum type);
+    GLuint loadShaderFromFile(const std::string &shaderFile, GLenum type);
     
-        GLuint programID;
+    GLuint programID;
     
-        GLuint projectionMatrixUniform;
-        GLuint modelMatrixUniform;
-        GLuint viewMatrixUniform;
+    GLuint projectionMatrixUniform;
+    GLuint modelMatrixUniform;
+    GLuint viewMatrixUniform;
     
-        GLuint positionAttribute;
-        GLuint texCoordAttribute;
+    GLuint positionAttribute;
+    GLuint texCoordAttribute;
     
-        GLuint vertexShader;
-        GLuint fragmentShader;
+    GLuint vertexShader;
+    GLuint fragmentShader;
 };
+
+GLuint loadTexture(const char* image_path);

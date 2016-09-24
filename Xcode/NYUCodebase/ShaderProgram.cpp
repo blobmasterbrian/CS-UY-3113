@@ -1,5 +1,6 @@
 
 #include "ShaderProgram.h"
+#include <SDL_image.h>
 
 ShaderProgram::ShaderProgram(const char *vertexShaderFile, const char *fragmentShaderFile) {
     
@@ -33,6 +34,23 @@ ShaderProgram::~ShaderProgram() {
     glDeleteProgram(programID);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+}
+
+GLuint loadTexture(const char* image_path) {
+    SDL_Surface* surface = IMG_Load(image_path);
+    
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, surface->w, surface->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, surface->pixels);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    SDL_FreeSurface(surface);
+    
+    return textureID;
 }
 
 GLuint ShaderProgram::loadShaderFromFile(const std::string &shaderFile, GLenum type) {

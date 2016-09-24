@@ -4,6 +4,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include "ShaderProgram.h"
+#include "Matrix.h"
 
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
@@ -25,8 +27,65 @@ int main(int argc, char *argv[])
     
     SDL_Event event;
     bool done = false;
+    float lastFrameTicks = 0.0f;
+    glViewport(0, 0, 640, 360);
+    
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    
+    GLuint redChip = loadTexture("/Images/chipRedWhite_sideBorder.png");
+    GLuint greenChip = loadTexture("/Images/chipGreenWhite_sideBorder.png");
+    GLuint blueChip = loadTexture("/Images/chipBlueWhite_sideBorder.png");
+    GLuint blackChip = loadTexture("/Images/chipBlackWhite_sideBorder.png");
+    
+    Matrix projectionMatrix;
+    Matrix modelMatrix;
+    Matrix viewMatrix;
+    
+    projectionMatrix.setOrthoProjection(-7.0f, 7.0f, -4.0f, 4.0f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
     while (!done) {
         while (SDL_PollEvent(&event)) {
+            glClear(GL_COLOR_BUFFER_BIT);
+            
+            float ticks = (float) SDL_GetTicks()/1000.0f;
+            float elapsed = ticks - lastFrameTicks;
+            lastFrameTicks = ticks;
+            
+            program.setModelMatrix(modelMatrix);
+            program.setProjectionMatrix(projectionMatrix);
+            program.setViewMatrix(viewMatrix);
+            
+            float vertices[] = {0.5f, -0.5f, 0.0f, 0.5f, -0.5f, -0.5f};
+            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+            glEnableVertexAttribArray(program.positionAttribute);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDisableVertexAttribArray(program.positionAttribute);
+            
+//            glBindTexture(GL_TEXTURE_2D, redChip);
+//            glBindTexture(GL_TEXTURE_2D, greenChip);
+//            glBindTexture(GL_TEXTURE_2D, blueChip);
+//            glBindTexture(GL_TEXTURE_2D, blackChip);
+//            
+//            float vertices[] = {
+//                -0.5, -0.5, 0.5,
+//                -0.5, 0.5, 0.5,
+//                -0.5, -0.5, 0.5,
+//                0.5, -0.5, 0.5
+//            };
+//            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+//            glEnableVertexAttribArray(program.positionAttribute);
+//            
+//            float texCoords[] = {0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0};
+//            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+//            glEnableVertexAttribArray(program.texCoordAttribute);
+//            
+//            glDrawArrays(GL_TRIANGLES, 0, 6);
+//            glDisableVertexAttribArray(program.positionAttribute);
+//            glDisableVertexAttribArray(program.texCoordAttribute);
+            
+            SDL_GL_SwapWindow(displayWindow);
+            
             if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
                 done = true;
             }
