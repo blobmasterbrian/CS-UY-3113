@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     float lastFrameTicks = 0.0f;
     glViewport(0, 0, 640, 360);
     
-    ShaderProgram program(RESOURCE_FOLDER "vertex.glsl", RESOURCE_FOLDER "fragment.glsl");
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     
     GLuint redChip = loadTexture("/Images/chipRedWhite_sideBorder.png");
     GLuint greenChip = loadTexture("/Images/chipGreenWhite_sideBorder.png");
@@ -65,11 +65,6 @@ int main(int argc, char *argv[])
 //            glDrawArrays(GL_TRIANGLES, 0, 3);
 //            glDisableVertexAttribArray(program.positionAttribute);
             
-            glBindTexture(GL_TEXTURE_2D, redChip);
-            glBindTexture(GL_TEXTURE_2D, greenChip);
-            glBindTexture(GL_TEXTURE_2D, blueChip);
-            glBindTexture(GL_TEXTURE_2D, blackChip);
-            
             float vertices[] = {
                 // First Square
                 -0.7, -0.5, // Triangle 1 Coord A
@@ -82,16 +77,17 @@ int main(int argc, char *argv[])
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
             glEnableVertexAttribArray(program.positionAttribute);
             
-//            float texCoords[] = {
-//                0.0, 1.0,
-//                1.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 0.0
-//            };
-//            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-//            glEnableVertexAttribArray(program.texCoordAttribute);
+            glBindTexture(GL_TEXTURE_2D, redChip);
+            float texCoords[] = {
+                0.0, 1.0,
+                1.0, 1.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 0.0,
+                0.0, 0.0
+            };
+            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices1[] = {
                 -0.7, 0.0,
@@ -104,16 +100,17 @@ int main(int argc, char *argv[])
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
             glEnableVertexAttribArray(program.positionAttribute);
             
-//            float texCoords1[] = {
-//                0.0, 1.0,
-//                1.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 0.0
-//            };
-//            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
-//            glEnableVertexAttribArray(program.texCoordAttribute);
+            glBindTexture(GL_TEXTURE_2D, greenChip);
+            float texCoords1[] = {
+                0.0, 1.0,
+                1.0, 1.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 0.0,
+                0.0, 0.0
+            };
+            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
+            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices2[] = {
                 -0.7, 0.5,
@@ -125,17 +122,18 @@ int main(int argc, char *argv[])
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
             glEnableVertexAttribArray(program.positionAttribute);
-            
-//            float texCoords2[] = {
-//                0.0, 1.0,
-//                1.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 0.0
-//            };
-//            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
-//            glEnableVertexAttribArray(program.texCoordAttribute);
+
+            glBindTexture(GL_TEXTURE_2D, blueChip);
+            float texCoords2[] = {
+                0.0, 1.0,
+                1.0, 1.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 0.0,
+                0.0, 0.0
+            };
+            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
+            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices3[] = {
                 -0.7, dropchip1,
@@ -155,16 +153,17 @@ int main(int argc, char *argv[])
                 dropchip1 = 2.0;
                 dropchip2 = 3.0;
             }
-//            float texCoords3[] = {
-//                0.0, 1.0,
-//                1.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 1.0,
-//                1.0, 0.0,
-//                0.0, 0.0
-//            };
-//            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords3);
-//            glEnableVertexAttribArray(program.texCoordAttribute);
+            glBindTexture(GL_TEXTURE_2D, blackChip);
+            float texCoords3[] = {
+                0.0, 1.0,
+                1.0, 1.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 0.0,
+                0.0, 0.0
+            };
+            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords3);
+            glEnableVertexAttribArray(program.texCoordAttribute);
             
             glDrawArrays(GL_TRIANGLES, 0, 24);
             glDisableVertexAttribArray(program.positionAttribute);
