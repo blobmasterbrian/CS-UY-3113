@@ -46,6 +46,8 @@ int main(int argc, char *argv[])
     bool done = false;
     float lastFrameTicks = 0.0f;
     glViewport(0, 0, 640, 360);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     
@@ -108,12 +110,12 @@ int main(int argc, char *argv[])
             glDrawArrays(GL_TRIANGLES, 0, 6);
             
             float vertices1[] = {
-                -0.7, 0.0,
-                0.7, 0.0,
-                0.7, 1.0,
-                -0.7, 0.0,
-                0.7, 1.0,
-                -0.7, 1.0
+                -0.7, -0.25,
+                0.7, -0.25,
+                0.7, 0.75,
+                -0.7, -0.25,
+                0.7, 0.75,
+                -0.7, 0.75
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
             glEnableVertexAttribArray(program.positionAttribute);
@@ -132,12 +134,12 @@ int main(int argc, char *argv[])
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
             float vertices2[] = {
-                -0.7, 0.5,
-                0.7, 0.5,
-                0.7, 1.5,
-                -0.7, 0.5,
-                0.7, 1.5,
-                -0.7, 1.5
+                -0.7, 0.0,
+                0.7, 0.0,
+                0.7, 1.0,
+                -0.7, 0.0,
+                0.7, 1.0,
+                -0.7, 1.0
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
             glEnableVertexAttribArray(program.positionAttribute);
@@ -166,7 +168,7 @@ int main(int argc, char *argv[])
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices3);
             glEnableVertexAttribArray(program.positionAttribute);
             
-            if (dropchip1 > 1.5) {
+            if (dropchip1 > 0.25) {
                 dropchip1 -= 0.01;
                 dropchip2 -= 0.01;
             } else {
