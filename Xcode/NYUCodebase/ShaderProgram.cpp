@@ -1,6 +1,5 @@
 
 #include "ShaderProgram.h"
-#include <SDL_image.h>
 
 ShaderProgram::ShaderProgram(const char *vertexShaderFile, const char *fragmentShaderFile) {
     
