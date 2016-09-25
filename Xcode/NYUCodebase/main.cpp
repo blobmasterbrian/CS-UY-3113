@@ -72,12 +72,12 @@ int main(int argc, char *argv[])
             
             float vertices[] = {
                 // First Square
-                -0.5, -0.5, // Triangle 1 Coord A
-                0.5, -0.5,  // Triangle 1 Coord B
-                0.5, 0.5,   // Triangle 1 Coord C
-                -0.5, -0.5, // Triangle 2 Coord A
-                0.5, 0.5,   // Triangle 2 Coord B
-                -0.5, 0.5   // Triangle 2 Coord C
+                -0.7, -0.5, // Triangle 1 Coord A
+                0.7, -0.5,  // Triangle 1 Coord B
+                0.7, 0.5,   // Triangle 1 Coord C
+                -0.7, -0.5, // Triangle 2 Coord A
+                0.7, 0.5,   // Triangle 2 Coord B
+                -0.7, 0.5   // Triangle 2 Coord C
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
             glEnableVertexAttribArray(program.positionAttribute);
@@ -94,12 +94,12 @@ int main(int argc, char *argv[])
 //            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices1[] = {
-                -0.5, 0.0,
-                0.5, 0.0,
-                0.5, 1.0,
-                -0.5, 0.0,
-                0.5, 1.0,
-                -0.5, 1.0
+                -0.7, 0.0,
+                0.7, 0.0,
+                0.7, 1.0,
+                -0.7, 0.0,
+                0.7, 1.0,
+                -0.7, 1.0
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
             glEnableVertexAttribArray(program.positionAttribute);
@@ -116,12 +116,12 @@ int main(int argc, char *argv[])
 //            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices2[] = {
-                -0.5, 0.5,
-                0.5, 0.5,
-                0.5, 1.5,
-                -0.5, 0.5,
-                0.5, 1.5,
-                -0.5, 1.5
+                -0.7, 0.5,
+                0.7, 0.5,
+                0.7, 1.5,
+                -0.7, 0.5,
+                0.7, 1.5,
+                -0.7, 1.5
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
             glEnableVertexAttribArray(program.positionAttribute);
@@ -138,12 +138,12 @@ int main(int argc, char *argv[])
 //            glEnableVertexAttribArray(program.texCoordAttribute);
             
             float vertices3[] = {
-                -0.5, dropchip1,
-                0.5, dropchip1,
-                0.5, dropchip2,
-                -0.5, dropchip1,
-                0.5, dropchip2,
-                -0.5, dropchip2
+                -0.7, dropchip1,
+                0.7, dropchip1,
+                0.7, dropchip2,
+                -0.7, dropchip1,
+                0.7, dropchip2,
+                -0.7, dropchip2
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices3);
             glEnableVertexAttribArray(program.positionAttribute);
