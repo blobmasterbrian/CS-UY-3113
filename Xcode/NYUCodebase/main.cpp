@@ -15,6 +15,23 @@
 
 SDL_Window* displayWindow;
 
+GLuint LoadTexture(const char* image_path) {
+    SDL_Surface* surface = IMG_Load(image_path);
+    
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    SDL_FreeSurface(surface);
+    
+    return textureID;
+}
+
 int main(int argc, char *argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -32,10 +49,10 @@ int main(int argc, char *argv[])
     
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     
-    GLuint redChip = loadTexture("/Images/chipRedWhite_sideBorder.png");
-    GLuint greenChip = loadTexture("/Images/chipGreenWhite_sideBorder.png");
-    GLuint blueChip = loadTexture("/Images/chipBlueWhite_sideBorder.png");
-    GLuint blackChip = loadTexture("/Images/chipBlackWhite_sideBorder.png");
+    GLuint redChip = LoadTexture("/Images/chipRedWhite_sideBorder.png");
+    GLuint greenChip = LoadTexture("/Images/chipGreenWhite_sideBorder.png");
+    GLuint blueChip = LoadTexture("/Images/chipBlueWhite_sideBorder.png");
+    GLuint blackChip = LoadTexture("/Images/chipBlackWhite_sideBorder.png");
     
     Matrix projectionMatrix;
     Matrix modelMatrix;
@@ -88,6 +105,7 @@ int main(int argc, char *argv[])
             };
             glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
             glEnableVertexAttribArray(program.texCoordAttribute);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
             
             float vertices1[] = {
                 -0.7, 0.0,
@@ -111,7 +129,8 @@ int main(int argc, char *argv[])
             };
             glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
             glEnableVertexAttribArray(program.texCoordAttribute);
-            
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
             float vertices2[] = {
                 -0.7, 0.5,
                 0.7, 0.5,
@@ -134,7 +153,8 @@ int main(int argc, char *argv[])
             };
             glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
             glEnableVertexAttribArray(program.texCoordAttribute);
-            
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
             float vertices3[] = {
                 -0.7, dropchip1,
                 0.7, dropchip1,
@@ -164,8 +184,8 @@ int main(int argc, char *argv[])
             };
             glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords3);
             glEnableVertexAttribArray(program.texCoordAttribute);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
             
-            glDrawArrays(GL_TRIANGLES, 0, 24);
             glDisableVertexAttribArray(program.positionAttribute);
             glDisableVertexAttribArray(program.texCoordAttribute);
             

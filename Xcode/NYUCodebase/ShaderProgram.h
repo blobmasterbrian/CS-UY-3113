@@ -35,5 +35,3 @@ public:
     GLuint vertexShader;
     GLuint fragmentShader;
 };
-
-GLuint loadTexture(const char* image_path);
