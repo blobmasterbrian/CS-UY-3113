@@ -41,6 +41,9 @@ int main(int argc, char *argv[])
     Matrix modelMatrix;
     Matrix viewMatrix;
     
+    float dropchip1 = 2.0;
+    float dropchip2 = 3.0;
+    
     projectionMatrix.setOrthoProjection(-7.0f, 7.0f, -4.0f, 4.0f, -1.0f, 1.0f);
     glUseProgram(program.programID);
     
@@ -134,20 +137,24 @@ int main(int argc, char *argv[])
 //            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
 //            glEnableVertexAttribArray(program.texCoordAttribute);
             
-            float dropchip1 = 2.0;
-            float dropchip2 = 3.0;
-            
             float vertices3[] = {
-                -0.5, dropchip1 - elapsed,
-                0.5, dropchip1 - elapsed,
-                0.5, dropchip2 - elapsed,
-                -0.5, dropchip1 - elapsed,
-                0.5, dropchip2 - elapsed,
-                -0.5, dropchip2 - elapsed
+                -0.5, dropchip1,
+                0.5, dropchip1,
+                0.5, dropchip2,
+                -0.5, dropchip1,
+                0.5, dropchip2,
+                -0.5, dropchip2
             };
             glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices3);
             glEnableVertexAttribArray(program.positionAttribute);
             
+            if (dropchip1 > 1.5) {
+                dropchip1 -= 0.01;
+                dropchip2 -= 0.01;
+            } else {
+                dropchip1 = 2.0;
+                dropchip2 = 3.0;
+            }
 //            float texCoords3[] = {
 //                0.0, 1.0,
 //                1.0, 1.0,
