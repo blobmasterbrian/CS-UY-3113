@@ -68,135 +68,134 @@ int main(int argc, char *argv[])
     
     while (!done) {
         while (SDL_PollEvent(&event)) {
-            glClear(GL_COLOR_BUFFER_BIT);
-            
-            float ticks = (float) SDL_GetTicks()/1000.0f;
-            float elapsed = ticks - lastFrameTicks;
-            lastFrameTicks = ticks;
-            
-            program.setModelMatrix(modelMatrix);
-            program.setProjectionMatrix(projectionMatrix);
-            program.setViewMatrix(viewMatrix);
-            
-//            float vertices[] = {0.5f, -0.5f, 0.0f, 0.5f, -0.5f, -0.5f};
-//            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-//            glEnableVertexAttribArray(program.positionAttribute);
-//            glDrawArrays(GL_TRIANGLES, 0, 3);
-//            glDisableVertexAttribArray(program.positionAttribute);
-            
-            float vertices[] = {
-                // First Square
-                -0.7, -0.5, // Triangle 1 Coord A
-                0.7, -0.5,  // Triangle 1 Coord B
-                0.7, 0.5,   // Triangle 1 Coord C
-                -0.7, -0.5, // Triangle 2 Coord A
-                0.7, 0.5,   // Triangle 2 Coord B
-                -0.7, 0.5   // Triangle 2 Coord C
-            };
-            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-            glEnableVertexAttribArray(program.positionAttribute);
-            
-            glBindTexture(GL_TEXTURE_2D, redChip);
-            float texCoords[] = {
-                0.0, 1.0,
-                1.0, 1.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                0.0, 0.0
-            };
-            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-            glEnableVertexAttribArray(program.texCoordAttribute);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            
-            float vertices1[] = {
-                -0.7, -0.25,
-                0.7, -0.25,
-                0.7, 0.75,
-                -0.7, -0.25,
-                0.7, 0.75,
-                -0.7, 0.75
-            };
-            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
-            glEnableVertexAttribArray(program.positionAttribute);
-            
-            glBindTexture(GL_TEXTURE_2D, greenChip);
-            float texCoords1[] = {
-                0.0, 1.0,
-                1.0, 1.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                0.0, 0.0
-            };
-            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
-            glEnableVertexAttribArray(program.texCoordAttribute);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-
-            float vertices2[] = {
-                -0.7, 0.0,
-                0.7, 0.0,
-                0.7, 1.0,
-                -0.7, 0.0,
-                0.7, 1.0,
-                -0.7, 1.0
-            };
-            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
-            glEnableVertexAttribArray(program.positionAttribute);
-
-            glBindTexture(GL_TEXTURE_2D, blueChip);
-            float texCoords2[] = {
-                0.0, 1.0,
-                1.0, 1.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                0.0, 0.0
-            };
-            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
-            glEnableVertexAttribArray(program.texCoordAttribute);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-
-            float vertices3[] = {
-                -0.7, dropchip1,
-                0.7, dropchip1,
-                0.7, dropchip2,
-                -0.7, dropchip1,
-                0.7, dropchip2,
-                -0.7, dropchip2
-            };
-            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices3);
-            glEnableVertexAttribArray(program.positionAttribute);
-            
-            if (dropchip1 > 0.25) {
-                dropchip1 -= 0.01;
-                dropchip2 -= 0.01;
-            } else {
-                dropchip1 = 2.0;
-                dropchip2 = 3.0;
-            }
-            glBindTexture(GL_TEXTURE_2D, blackChip);
-            float texCoords3[] = {
-                0.0, 1.0,
-                1.0, 1.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 0.0,
-                0.0, 0.0
-            };
-            glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords3);
-            glEnableVertexAttribArray(program.texCoordAttribute);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            
-            glDisableVertexAttribArray(program.positionAttribute);
-            glDisableVertexAttribArray(program.texCoordAttribute);
-            
-            SDL_GL_SwapWindow(displayWindow);
-            
             if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
                 done = true;
             }
         }
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        float ticks = (float) SDL_GetTicks()/1000.0f;
+        float elapsed = ticks - lastFrameTicks;
+        lastFrameTicks = ticks;
+        
+        program.setModelMatrix(modelMatrix);
+        program.setProjectionMatrix(projectionMatrix);
+        program.setViewMatrix(viewMatrix);
+        
+        //            float vertices[] = {0.5f, -0.5f, 0.0f, 0.5f, -0.5f, -0.5f};
+        //            glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        //            glEnableVertexAttribArray(program.positionAttribute);
+        //            glDrawArrays(GL_TRIANGLES, 0, 3);
+        //            glDisableVertexAttribArray(program.positionAttribute);
+        
+        float vertices[] = {
+            // First Square
+            -0.7, -0.5, // Triangle 1 Coord A
+            0.7, -0.5,  // Triangle 1 Coord B
+            0.7, 0.5,   // Triangle 1 Coord C
+            -0.7, -0.5, // Triangle 2 Coord A
+            0.7, 0.5,   // Triangle 2 Coord B
+            -0.7, 0.5   // Triangle 2 Coord C
+        };
+        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        glEnableVertexAttribArray(program.positionAttribute);
+        
+        glBindTexture(GL_TEXTURE_2D, redChip);
+        float texCoords[] = {
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
+        };
+        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+        glEnableVertexAttribArray(program.texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        float vertices1[] = {
+            -0.7, -0.25,
+            0.7, -0.25,
+            0.7, 0.75,
+            -0.7, -0.25,
+            0.7, 0.75,
+            -0.7, 0.75
+        };
+        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
+        glEnableVertexAttribArray(program.positionAttribute);
+        
+        glBindTexture(GL_TEXTURE_2D, greenChip);
+        float texCoords1[] = {
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
+        };
+        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
+        glEnableVertexAttribArray(program.texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        float vertices2[] = {
+            -0.7, 0.0,
+            0.7, 0.0,
+            0.7, 1.0,
+            -0.7, 0.0,
+            0.7, 1.0,
+            -0.7, 1.0
+        };
+        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
+        glEnableVertexAttribArray(program.positionAttribute);
+        
+        glBindTexture(GL_TEXTURE_2D, blueChip);
+        float texCoords2[] = {
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
+        };
+        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords2);
+        glEnableVertexAttribArray(program.texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        float vertices3[] = {
+            -0.7, dropchip1,
+            0.7, dropchip1,
+            0.7, dropchip2,
+            -0.7, dropchip1,
+            0.7, dropchip2,
+            -0.7, dropchip2
+        };
+        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices3);
+        glEnableVertexAttribArray(program.positionAttribute);
+        
+        if (dropchip1 > 0.25) {
+            dropchip1 -= 0.01;
+            dropchip2 -= 0.01;
+        } else {
+            dropchip1 = 2.0;
+            dropchip2 = 3.0;
+        }
+        glBindTexture(GL_TEXTURE_2D, blackChip);
+        float texCoords3[] = {
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
+        };
+        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords3);
+        glEnableVertexAttribArray(program.texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        glDisableVertexAttribArray(program.positionAttribute);
+        glDisableVertexAttribArray(program.texCoordAttribute);
+        
         SDL_GL_SwapWindow(displayWindow);
     }
     
