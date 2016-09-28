@@ -174,8 +174,8 @@ int main(int argc, char *argv[])
         glEnableVertexAttribArray(program.positionAttribute);
         
         if (dropchip1 > 0.25) {
-            dropchip1 -= 0.01;
-            dropchip2 -= 0.01;
+            dropchip1 -= elapsed * 0.5;   //0.01;
+            dropchip2 -= elapsed * 0.5;   //0.01;
         } else {
             dropchip1 = 2.0;
             dropchip2 = 3.0;
