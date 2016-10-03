@@ -35,9 +35,10 @@ GLuint LoadTexture(const char* image_path) {
 
 struct Paddle
 {
-    Paddle(): x(0), y(0) {}
+    Paddle(): x(0.0), y(0.0), height(1.0) {}
     float x;
     float y;
+    float height;
 };
 
 struct Ball
@@ -115,22 +116,22 @@ int main(int argc, char *argv[])
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP && right.y <= 3.395) {
                     right.y += 15.0 * elapsed;
                 }
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_DOWN && right.y >= -3.395) {
                     right.y -= 15.0 * elapsed;
                 }
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_W) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_W && left.y <= 3.395) {
                     left.y += 15.0 * elapsed;
                 }
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_S) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_S && left.y >= -3.395) {
                     left.y -= 15.0 * elapsed;
                 }
             }
@@ -139,9 +140,6 @@ int main(int argc, char *argv[])
         if (ball.y >= 3.895 || ball.y <= -3.895) {
             ball.arr[1] = -ball.arr[1];
         }
-        
-        ball.x += ball.arr[0] * elapsed;
-        ball.y += ball.arr[1] * elapsed;
         
         program.setModelMatrix(paddleMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
@@ -156,6 +154,15 @@ int main(int argc, char *argv[])
         paddleMatrix2.identity();
         glDrawArrays(GL_TRIANGLES, 0, 6);
         paddleMatrix2.Translate(6.9, right.y, 0);
+        
+        if (ball.x >= 6.8 && ball.y > right.y - right.height/2 && ball.y < right.y + right.height/2) {
+            ball.arr[0] = -ball.arr[0];
+        }
+        if (ball.x <= -6.8 && ball.y > left.y - left.height/2 && ball.y < left.y + left.height/2) {
+            ball.arr[0] = -ball.arr[0];
+        }
+        ball.x += ball.arr[0] * elapsed;
+        ball.y += ball.arr[1] * elapsed;
         
         program.setModelMatrix(ballMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, ballVertices);
