@@ -19,18 +19,18 @@ SDL_Window* displayWindow;
 
 GLuint LoadTexture(const char* image_path) {
     SDL_Surface* surface = IMG_Load(image_path);
-    
+
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, surface->pixels);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
+
     SDL_FreeSurface(surface);
-    
+
     return textureID;
 }
 
@@ -63,35 +63,35 @@ int main(int argc, char *argv[])
 #ifdef _WINDOWS
     glewInit();
 #endif
-    
+
     SDL_Event event;
     bool done = false;
     float lastFrameTicks = 0.0f;
     glViewport(0, 0, 640, 360);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    
+
     Matrix projectionMatrix;
     Matrix viewMatrix;
-    
+
     Matrix paddleMatrix;
     Matrix paddleMatrix2;
     Matrix ballMatrix;
     Matrix lScoreMatrix;
     Matrix rScoreMatrix;
-    
+
     Paddle left;
     Paddle right;
     Ball ball;
-    
+
     GLuint lPaddleTex = LoadTexture("/Images/blocks.png");
     GLuint rPaddleTex = LoadTexture("/Images/blocks.png");
     GLuint ballTex = LoadTexture("/Images/blocks.png");
     GLuint lScore = LoadTexture("/Images/pixel_font.png");
     GLuint rScore = LoadTexture("/Images/pixel_font.png");
-    
+
     float paddleVertices[] = {
         -0.1, -0.5, // Triangle 1 Coord A
         0.1, -0.5,  // Triangle 1 Coord B
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         0.1, 0.5,   // Triangle 2 Coord B
         -0.1, 0.5   // Triangle 2 Coord C
     };
-    
+
     float ballVertices[] = {
         -0.1, -0.1, // Triangle 1 Coord A
         0.1, -0.1,  // Triangle 1 Coord B
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         0.1, 0.1,   // Triangle 2 Coord B
         -0.1, 0.1   // Triangle 2 Coord C
     };
-    
+
     float scoreVertices[] = {
         -0.4, -0.5, // Triangle 1 Coord A
         0.4, -0.5,  // Triangle 1 Coord B
@@ -118,23 +118,23 @@ int main(int argc, char *argv[])
         0.4, 0.5,   // Triangle 2 Coord B
         -0.4, 0.5   // Triangle 2 Coord C
     };
-    
+
     srand((int)time(NULL));
-    
+
     projectionMatrix.setOrthoProjection(-7.0f, 7.0f, -4.0f, 4.0f, -1.0f, 1.0f);
     glUseProgram(program.programID);
-    
+
     while (!done) {
-        
+
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
         float ticks = (float) SDL_GetTicks()/1000.0f;
         float elapsed = ticks - lastFrameTicks;
         lastFrameTicks = ticks;
-        
+
         program.setProjectionMatrix(projectionMatrix);
         program.setViewMatrix(viewMatrix);
-        
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
                 done = true;
@@ -176,12 +176,12 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        
+
         if (ball.y >= 3.895 || ball.y <= -3.895) {
             ball.arr[1] = -ball.arr[1];
             ball.bIndex = rand() % 8;
         }
-        
+
         program.setModelMatrix(paddleMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
         glEnableVertexAttribArray(program.positionAttribute);
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
         glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, lPaddleTexCoord);
         glEnableVertexAttribArray(program.texCoordAttribute);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
         program.setModelMatrix(paddleMatrix2);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
         glEnableVertexAttribArray(program.positionAttribute);
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
         glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, rPaddleTexCoord);
         glEnableVertexAttribArray(program.texCoordAttribute);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
         if (ball.x >= 6.75 && ball.x <= 7.00 && ball.y > right.y - right.height/2 && ball.y < right.y + right.height/2) {
             ball.arr[0] = -ball.arr[0];
             right.pIndex = ball.bIndex;
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
         }
         ball.x += ball.arr[0] * elapsed;
         ball.y += ball.arr[1] * elapsed;
-        
+
         if (ball.x >= 8.5) {
             left.score++;
             ball.x = 0.0;
@@ -289,10 +289,10 @@ int main(int argc, char *argv[])
                 right.accel = 0.0;
             }
         }
-        
+
         int lIndex = left.score + 48;
         int rIndex = right.score + 48;
-        
+
         program.setModelMatrix(ballMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, ballVertices);
         glEnableVertexAttribArray(program.positionAttribute);
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
         glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, ballTexCoord);
         glEnableVertexAttribArray(program.texCoordAttribute);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
         program.setModelMatrix(lScoreMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, scoreVertices);
         glEnableVertexAttribArray(program.positionAttribute);
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
         glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
         glEnableVertexAttribArray(program.texCoordAttribute);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
         program.setModelMatrix(rScoreMatrix);
         glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, scoreVertices);
         glEnableVertexAttribArray(program.positionAttribute);
@@ -356,13 +356,13 @@ int main(int argc, char *argv[])
         glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
         glEnableVertexAttribArray(program.texCoordAttribute);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);
-        
+
         SDL_GL_SwapWindow(displayWindow);
     }
-    
+
     SDL_Quit();
     return 0;
 }
