@@ -17,7 +17,8 @@
 
 SDL_Window* displayWindow;
 
-GLuint LoadTexture(const char* image_path) {
+GLuint LoadTexture(const char* image_path)
+{
     SDL_Surface* surface = IMG_Load(image_path);
 
     GLuint textureID;
@@ -34,335 +35,221 @@ GLuint LoadTexture(const char* image_path) {
     return textureID;
 }
 
-struct Paddle
+struct Vec2D
 {
-    Paddle(): x(0.0), y(0.0), height(1.0), score(0), pIndex(4), accel(0.0){}
+    Vec2D(float x = 0.0f, float y = -0.0f): x(x), y(y) {}
     float x;
     float y;
+};
+
+struct texturedObject
+{
+    texturedObject(): u(0.0f), v(0.0f), height(1.0f), width(1.0f) {}
+    texturedObject(GLuint id, float height = 1.0f, float width = 1.0f): textureID(id), u(0.0f), v(0.0f),
+                                                                        height(height), width(width), spriteX(1.0f), spriteY(1.0f){}
+    GLuint textureID;
+    Matrix matrix;
+    float u;
+    float v;
     float height;
-    int score;
-    int pIndex;
-    float accel;
+    float width;
+    float spriteX;
+    float spriteY;
+    Vec2D position;
+    Vec2D velocity;
+    Vec2D acceleration;
 };
 
-struct Ball
+struct spriteSheet : texturedObject
 {
-    Ball(): x(0), y(0), bIndex(4){}
-    float x;
-    float y;
-    int bIndex;
-    float arr[2] = {0.0, 0.0};
+    spriteSheet(GLuint id, int xElements, int yElements, int index = 1, float height = 1.0f, float width = 1.0f): texturedObject(id, height, width)
+    , index(index), horizontalNum(xElements), verticalNum(yElements)
+    {
+        u = (float)(((int)index) % horizontalNum) / (float) horizontalNum;
+        v = (float)(((int)index) / horizontalNum) / (float) verticalNum;
+        spriteX = 1.0/(float)horizontalNum;
+        spriteY = 1.0/(float)verticalNum;
+    }
+    
+    void setSpriteCoords(int index)
+    {
+        u = (float)(((int)index) % horizontalNum) / (float) horizontalNum;
+        v = (float)(((int)index) / horizontalNum) / (float) verticalNum;
+        spriteX = 1.0/(float)horizontalNum;
+        spriteY = 1.0/(float)verticalNum;
+    }
+    int index;
+    int horizontalNum;
+    int verticalNum;
 };
 
-int main(int argc, char *argv[])
+void drawTexture(ShaderProgram* program, texturedObject* obj, float scale = 1.0f)
+{
+    program->setModelMatrix(obj->matrix);
+    float aspect = obj->width/obj->height;
+    float vertices[] = {
+        -0.5f * scale * aspect, -0.5f * scale, // Triangle 1 Coord A
+        0.5f * scale * aspect, -0.5f * scale,  // Triangle 1 Coord B
+        0.5f * scale * aspect, 0.5f * scale,   // Triangle 1 Coord C
+        -0.5f * scale * aspect, -0.5f * scale, // Triangle 2 Coord A
+        0.5f * scale * aspect, 0.5f * scale,   // Triangle 2 Coord B
+        -0.5f * scale * aspect, 0.5f * scale   // Triangle 2 Coord C
+    };
+    
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+    glEnableVertexAttribArray(program->positionAttribute);
+    obj->matrix.identity();
+    obj->matrix.Translate(obj->position.x, obj->position.y, 0);
+    
+    glBindTexture(GL_TEXTURE_2D, obj->textureID);
+    float texCoords[] = {
+        obj->u, obj->v + obj->spriteY,
+        obj->u + obj->spriteX, obj->v + obj->spriteY,
+        obj->u + obj->spriteX, obj->v,
+        obj->u, obj->v + obj->spriteY,
+        obj->u + obj->spriteX, obj->v,
+        obj->u, obj->v
+    };
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+    glEnableVertexAttribArray(program->texCoordAttribute);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+enum class EntityType {Player, Platform, Enemy};
+enum class GameState {MainMenu, Level};
+GameState state = GameState::MainMenu;
+
+void mainMenu()
 {
     SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 360, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
     glewInit();
 #endif
-
+    
     SDL_Event event;
     bool done = false;
-    float lastFrameTicks = 0.0f;
-    glViewport(0, 0, 640, 360);
+    glViewport(0, 0, 1280, 720);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-
+    
     Matrix projectionMatrix;
     Matrix viewMatrix;
-
-    Matrix paddleMatrix;
-    Matrix paddleMatrix2;
-    Matrix ballMatrix;
-    Matrix lScoreMatrix;
-    Matrix rScoreMatrix;
-
-    Paddle left;
-    Paddle right;
-    Ball ball;
-
-    GLuint lPaddleTex = LoadTexture("/Images/blocks.png");
-    GLuint rPaddleTex = LoadTexture("/Images/blocks.png");
-    GLuint ballTex = LoadTexture("/Images/blocks.png");
-    GLuint lScore = LoadTexture("/Images/pixel_font.png");
-    GLuint rScore = LoadTexture("/Images/pixel_font.png");
-
-    float paddleVertices[] = {
-        -0.1, -0.5, // Triangle 1 Coord A
-        0.1, -0.5,  // Triangle 1 Coord B
-        0.1, 0.5,   // Triangle 1 Coord C
-        -0.1, -0.5, // Triangle 2 Coord A
-        0.1, 0.5,   // Triangle 2 Coord B
-        -0.1, 0.5   // Triangle 2 Coord C
-    };
-
-    float ballVertices[] = {
-        -0.1, -0.1, // Triangle 1 Coord A
-        0.1, -0.1,  // Triangle 1 Coord B
-        0.1, 0.1,   // Triangle 1 Coord C
-        -0.1, -0.1, // Triangle 2 Coord A
-        0.1, 0.1,   // Triangle 2 Coord B
-        -0.1, 0.1   // Triangle 2 Coord C
-    };
-
-    float scoreVertices[] = {
-        -0.4, -0.5, // Triangle 1 Coord A
-        0.4, -0.5,  // Triangle 1 Coord B
-        0.4, 0.5,   // Triangle 1 Coord C
-        -0.4, -0.5, // Triangle 2 Coord A
-        0.4, 0.5,   // Triangle 2 Coord B
-        -0.4, 0.5   // Triangle 2 Coord C
-    };
-
-    srand((int)time(NULL));
-
-    projectionMatrix.setOrthoProjection(-7.0f, 7.0f, -4.0f, 4.0f, -1.0f, 1.0f);
+    
+    GLuint i = LoadTexture("/Images/menu.png");
+    texturedObject obj(i, 1.0f, 4.0f);
+    
+    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
     glUseProgram(program.programID);
-
+    
     while (!done) {
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        float ticks = (float) SDL_GetTicks()/1000.0f;
-        float elapsed = ticks - lastFrameTicks;
-        lastFrameTicks = ticks;
-
-        program.setProjectionMatrix(projectionMatrix);
-        program.setViewMatrix(viewMatrix);
-
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-                    if (ball.arr[0] < 0.0){
-                        ball.arr[0] -= 2.0;
-                    } else {
-                        ball.arr[0] += 2.0;
-                    }
-                    if (ball.arr[1] < 0.0){
-                        ball.arr[1] -= 2.0;
-                    } else {
-                        ball.arr[1] += 2.0;
-                    }
-                    right.accel += 15.0;
-                    left.accel += 15.0;
+                    state = GameState::Level;
+                    done = true;
                 }
             }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP && right.y <= 3.395) {
-                    right.y += right.accel * elapsed;
-                }
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_DOWN && right.y >= -3.395) {
-                    right.y -= right.accel * elapsed;
-                }
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_W && left.y <= 3.395) {
-                    left.y += left.accel * elapsed;
-                }
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_S && left.y >= -3.395) {
-                    left.y -= left.accel * elapsed;
-                }
-            }
-        }
-
-        if (ball.y >= 3.895 || ball.y <= -3.895) {
-            ball.arr[1] = -ball.arr[1];
-            ball.bIndex = rand() % 8;
-        }
-
-        program.setModelMatrix(paddleMatrix);
-        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
-        glEnableVertexAttribArray(program.positionAttribute);
-        paddleMatrix.identity();
-        paddleMatrix.Translate(-6.9, left.y, 0);
-        glBindTexture(GL_TEXTURE_2D, lPaddleTex);
-        int spriteCountX = 11;
-        int spriteCountY = 6;
-        float up1 = (float)(((int)left.pIndex) % spriteCountX) / (float) spriteCountX;
-        float vp1 = (float)(((int)left.pIndex) / spriteCountX) / (float) spriteCountY;
-        float spriteWidth = 1.0/(float)spriteCountX;
-        float spriteHeight = 1.0/(float)spriteCountY;
-        float lPaddleTexCoord[] = {
-            up1, vp1+spriteHeight,
-            up1+spriteWidth, vp1+spriteHeight,
-            up1+spriteWidth, vp1,
-            up1, vp1+spriteHeight,
-            up1+spriteWidth, vp1,
-            up1, vp1
-        };
-        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, lPaddleTexCoord);
-        glEnableVertexAttribArray(program.texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        program.setModelMatrix(paddleMatrix2);
-        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
-        glEnableVertexAttribArray(program.positionAttribute);
-        paddleMatrix2.identity();
-        paddleMatrix2.Translate(6.9, right.y, 0);
-        glBindTexture(GL_TEXTURE_2D, rPaddleTex);
-        float up2 = (float)(((int)right.pIndex) % spriteCountX) / (float) spriteCountX;
-        float vp2 = (float)(((int)right.pIndex) / spriteCountX) / (float) spriteCountY;
-        float rPaddleTexCoord[] = {
-            up2, vp2+spriteHeight,
-            up2+spriteWidth, vp2+spriteHeight,
-            up2+spriteWidth, vp2,
-            up2, vp2+spriteHeight,
-            up2+spriteWidth, vp2,
-            up2, vp2
-        };
-        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, rPaddleTexCoord);
-        glEnableVertexAttribArray(program.texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        if (ball.x >= 6.75 && ball.x <= 7.00 && ball.y > right.y - right.height/2 && ball.y < right.y + right.height/2) {
-            ball.arr[0] = -ball.arr[0];
-            right.pIndex = ball.bIndex;
-            ball.bIndex = rand() % 8;
-        }
-        if (ball.x <= -6.75 && ball.x >= -7.0 && ball.y > left.y - left.height/2 && ball.y < left.y + left.height/2) {
-            ball.arr[0] = -ball.arr[0];
-            left.pIndex = ball.bIndex;
-            ball.bIndex = rand() % 8;
-        }
-        ball.x += ball.arr[0] * elapsed;
-        ball.y += ball.arr[1] * elapsed;
-
-        if (ball.x >= 8.5) {
-            left.score++;
-            ball.x = 0.0;
-            ball.y = 0.0;
-            if (ball.arr[0] > 2.0) {
-                ball.arr[0] -= 2.0;
-            }
-            if (ball.arr[1] > 2.0) {
-                ball.arr[1] -= 2.0;
-            } else if (ball.arr[1] < -2.0) {
-                ball.arr[1] += 2.0;
-            }
-            if (right.accel > 15.0) {
-                right.accel -= 15.0;
-                left.accel -= 15.0;
-            }
-            if (left.score == 10) {
-                ball.arr[0] = 0.0;
-                ball.arr[1] = 0.0;
-                right.score = 0;
-                right.accel = 0.0;
-                left.score = 0;
-                left.accel = 0.0;
-            }
-        }
-        if (ball.x <= -8.5) {
-            right.score++;
-            ball.x = 0.0;
-            ball.y = 0.0;
-            if (ball.arr[0] < -2.0) {
-                ball.arr[0] += 2.0;
-            }
-            if (ball.arr[1] > 2.0) {
-                ball.arr[1] -= 2.0;
-            } else if (ball.arr[1] < -2.0) {
-                ball.arr[1] += 2.0;
-            }
-            if (right.accel > 15.0) {
-                right.accel -= 15.0;
-                left.accel -= 15.0;
-            }
-            if (right.score == 10) {
-                ball.arr[0] = 0.0;
-                ball.arr[1] = 0.0;
-                left.score = 0;
-                left.accel = 0.0;
-                right.score = 0;
-                right.accel = 0.0;
-            }
-        }
-
-        int lIndex = left.score + 48;
-        int rIndex = right.score + 48;
-
-        program.setModelMatrix(ballMatrix);
-        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, ballVertices);
-        glEnableVertexAttribArray(program.positionAttribute);
-        ballMatrix.identity();
-        ballMatrix.Translate(ball.x, ball.y, 0);
-        glBindTexture(GL_TEXTURE_2D, ballTex);
-        float ub = (float)(((int)ball.bIndex) % spriteCountX) / (float) spriteCountX;
-        float vb = (float)(((int)ball.bIndex) / spriteCountX) / (float) spriteCountY;
-        float ballTexCoord[] = {
-            ub, vb+spriteHeight,
-            ub+spriteWidth, vb+spriteHeight,
-            ub+spriteWidth, vb,
-            ub, vb+spriteHeight,
-            ub+spriteWidth, vb,
-            ub, vb
-        };
-        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, ballTexCoord);
-        glEnableVertexAttribArray(program.texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        program.setModelMatrix(lScoreMatrix);
-        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, scoreVertices);
-        glEnableVertexAttribArray(program.positionAttribute);
-        lScoreMatrix.identity();
-        lScoreMatrix.Translate(-2.0, 3.0, 0);
-        glBindTexture(GL_TEXTURE_2D, lScore);
-        spriteCountX = 16;
-        spriteCountY = 16;
-        float u = (float)(((int)lIndex) % spriteCountX) / (float) spriteCountX;
-        float v = (float)(((int)lIndex) / spriteCountX) / (float) spriteCountY;
-        spriteWidth = 1.0/(float)spriteCountX;
-        spriteHeight = 1.0/(float)spriteCountY;
-        float texCoords[] = {
-            u, v+spriteHeight,
-            u+spriteWidth, v+spriteHeight,
-            u+spriteWidth, v,
-            u, v+spriteHeight,
-            u+spriteWidth, v,
-            u, v
-        };
-        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-        glEnableVertexAttribArray(program.texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        program.setModelMatrix(rScoreMatrix);
-        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, scoreVertices);
-        glEnableVertexAttribArray(program.positionAttribute);
-        rScoreMatrix.identity();
-        rScoreMatrix.Translate(2.0, 3.0, 0);
-        glBindTexture(GL_TEXTURE_2D, rScore);
-        float u1 = (float)(((int)rIndex) % spriteCountX) / (float) spriteCountX;
-        float v1 = (float)(((int)rIndex) / spriteCountX) / (float) spriteCountY;
-        float texCoords1[] = {
-            u1, v1+spriteHeight,
-            u1+spriteWidth, v1+spriteHeight,
-            u1+spriteWidth, v1,
-            u1, v1+spriteHeight,
-            u1+spriteWidth, v1,
-            u1, v1
-        };
-        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords1);
-        glEnableVertexAttribArray(program.texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
+        glClear(GL_COLOR_BUFFER_BIT);
+        program.setProjectionMatrix(projectionMatrix);
+        program.setViewMatrix(viewMatrix);
+        drawTexture(&program, &obj, 7.0f);
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);
+        SDL_GL_SwapWindow(displayWindow);
+        }
+    }
+    SDL_Quit();
+}
 
+void levelState()
+{
+    SDL_Init(SDL_INIT_VIDEO);
+    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+    SDL_GL_MakeCurrent(displayWindow, context);
+#ifdef _WINDOWS
+    glewInit();
+#endif
+    
+    SDL_Event event;
+    bool done = false;
+    float lastFrameTicks = 0.0f;
+    glViewport(0, 0, 1280, 720);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    
+    Matrix projectionMatrix;
+    Matrix viewMatrix;
+    
+    GLuint i = LoadTexture("/Images/1942.png");
+    spriteSheet obj(i, 17, 31, 102);
+    
+    srand((int)time(NULL));
+    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+                done = true;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                }
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+                }
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+                }
+            }
+        }
+        glClear(GL_COLOR_BUFFER_BIT);
+        float ticks = (float) SDL_GetTicks()/1000.0f;
+        float elapsed = ticks - lastFrameTicks;
+        lastFrameTicks = ticks;
+        program.setProjectionMatrix(projectionMatrix);
+        program.setViewMatrix(viewMatrix);
+        
+        drawTexture(&program, &obj);
+        
+        glDisableVertexAttribArray(program.positionAttribute);
+        glDisableVertexAttribArray(program.texCoordAttribute);
         SDL_GL_SwapWindow(displayWindow);
     }
-
+    
     SDL_Quit();
-    return 0;
+}
+
+void selectState()
+{
+    const Uint8* key = SDL_GetKeyboardState(NULL);
+    if (key[SDL_SCANCODE_SPACE]) {
+        state = GameState::Level;
+    }
+    switch (state) {
+        case GameState::MainMenu:
+            mainMenu();
+            
+        case GameState::Level:
+            levelState();
+            break;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    selectState();
 }
