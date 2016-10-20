@@ -412,7 +412,7 @@ void levelState()
         }
         for (size_t k = 0; k < 14; k++) {
             int shoot = rand();
-            if (shoot % 263 == 0 && frontmost[k].size() > 0) {
+            if (shoot % 313 == 0 && frontmost[k].size() > 0) {
                 Vec2D vec(enemies[*(frontmost[k].end()-1)]->position.x - 0.15f,
                           enemies[*(frontmost[k].end()-1)]->position.y -
                           enemies[*(frontmost[k].end()-1)]->height*enemies[*(frontmost[k].end()-1)]->scale/2.0f);
@@ -499,6 +499,17 @@ void levelState()
                     state = GameState::GameOver;
                     done = true;
                 }
+        }
+        
+        bool temp = true;
+        for (size_t o = 0; o < enemies.size(); o++) {
+            if (enemies[o] != nullptr) {
+                temp = false;
+            }
+        }
+        if (temp) {
+            state = GameState::Win;
+            done = true;
         }
         
         glDisableVertexAttribArray(program.positionAttribute);
