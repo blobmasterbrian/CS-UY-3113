@@ -144,7 +144,7 @@ float lerp(float v0, float v1, float t) {
 }
 
 enum class EntityType {Player, Platform, Enemy};
-enum class GameState {MainMenu, Level};
+enum class GameState {MainMenu, Level, Win, GameOver};
 GameState state = GameState::MainMenu;
 
 void mainMenu()
@@ -254,7 +254,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 7.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -266,7 +266,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 6.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -278,7 +278,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 5.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -290,7 +290,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 4.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -302,7 +302,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 3.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -314,7 +314,7 @@ void levelState()
     for (int i = 0; i < 15; i++) {
         spriteSheet* enemy = new spriteSheet(ships, 17, 31, enemyShip, 1.0f, 1.0f, 1.3f);
         enemy->setPosition(j-=1.5, 2.0f);
-        enemy->velocity.x = -2.0f;
+        enemy->velocity.x = -1.0f;
         enemy->velocity.y = 0.0f;
         enemies.push_back(enemy);
         frontmost[i].push_back(int(enemies.size()-1));
@@ -331,6 +331,9 @@ void levelState()
     
     projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
     glUseProgram(program.programID);
+    
+    GLuint red = LoadTexture("/Images/red.png");
+    texturedObject line(red, 1.0f, 100000.0f, Vec2D(0.0f, -6.70f), 0.1);
     
     while (!done) {
         while (SDL_PollEvent(&event)) {
@@ -354,6 +357,8 @@ void levelState()
         }
         
         glClear(GL_COLOR_BUFFER_BIT);
+        drawTexture(&program, &line);
+        
         float ticks = (float) SDL_GetTicks()/1000.0f;
         float elapsed = ticks - lastFrameTicks;
         lastFrameTicks = ticks;
@@ -371,10 +376,15 @@ void levelState()
         
         for (int k = 0; k < enemies.size(); k++) {
             if (enemies[k] != nullptr) {
+                if (enemies[k]->position.y - enemies[k]->height*enemies[k]->scale/2.0 < -7.05f) {
+                    state = GameState::GameOver;
+                    done = true;
+                    break;
+                }
+                
                 if (enemies[rowmost[k/15][rowmost[k/15].size()-1]]->position.x <= -13.5f || enemies[rowmost[k/15][0]]->position.x >= 10.0f) {
-                    float movement = 10.0f + (16.0f - rowmost[k/15].size());
                     enemies[k]->velocity.x = -enemies[k]->velocity.x;
-                    enemies[k]->position.y -= movement * elapsed;
+                    enemies[k]->position.y -= 10.0f * elapsed;
                 }
                 enemies[k]->update(elapsed);
                 drawTexture(&program, enemies[k]); //, 1.3f);
@@ -384,12 +394,22 @@ void levelState()
                     std::vector<int>::iterator eraser = std::remove(begin, end, k);
                     frontmost[k % q[k%15]].erase(eraser);
                     rowmost[k/15].erase(std::remove(rowmost[k/15].begin(), rowmost[k/15].end(), k));
+                    
+                    for (int g = rowmost[k/15][0]; g <= rowmost[k/15][rowmost[k/15].size()]; g++) {
+                        if (enemies[g] != nullptr) {
+                            if (enemies[g]->velocity.x > 0) {
+                                enemies[g]->velocity.x += 0.35;
+                            } else {
+                                enemies[g]->velocity.x -= 0.35;
+                            }
+                        }
+                    }
+                    
                     delete enemies[k];
                     enemies[k] = nullptr;
                 }
             }
         }
-        std::cout << *q << std::endl;
         for (size_t k = 0; k < 14; k++) {
             int shoot = rand();
             if (shoot % 263 == 0 && frontmost[k].size() > 0) {
@@ -463,6 +483,24 @@ void levelState()
             }
         }
         
+        for (size_t b = 0; b < enemyBullets.size(); b++) {
+                if(enemyBullets[b]->position.y + enemyBullets[b]->height*enemyBullets[b]->scale/2.0f >  // Enemy Bullet Top
+                   player.position.y - player.height*player.scale/2.0f &&                               // Player Bottom
+                   enemyBullets[b]->position.x + enemyBullets[b]->width*enemyBullets[b]->scale/2.0f >   // Enemy Bullet Right
+                   player.position.x - player.width*player.scale/2.0f &&                                // Player Left
+                   enemyBullets[b]->position.x - enemyBullets[b]->width*enemyBullets[b]->scale/2.0f <   // Enemy Bullet Left
+                   player.position.x + player.width*player.scale/2.0f &&                                // Player Right
+                   enemyBullets[b]->position.y - enemyBullets[b]->height*enemyBullets[b]->scale/2.0f <  // Enemy Bullet Bottom
+                   player.position.y + player.height*player.scale/2.0f) {                               // Player Top
+                    
+                    delete enemyBullets[b];
+                    enemyBullets[b] = nullptr;
+                    
+                    state = GameState::GameOver;
+                    done = true;
+                }
+        }
+        
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);
         SDL_GL_SwapWindow(displayWindow);
@@ -471,19 +509,123 @@ void levelState()
     SDL_Quit();
 }
 
+void victory()
+{
+    SDL_Init(SDL_INIT_VIDEO);
+    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+    SDL_GL_MakeCurrent(displayWindow, context);
+#ifdef _WINDOWS
+    glewInit();
+#endif
+    
+    SDL_Event event;
+    bool done = false;
+    glViewport(0, 0, 1280, 720);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    
+    Matrix projectionMatrix;
+    Matrix viewMatrix;
+    
+    GLuint i = LoadTexture("/Images/victory.png");
+    texturedObject obj(i, 1.0f, 4.0f, Vec2D(0.0f,0.0f), 5.0f);
+    
+    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+                done = true;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    done = true;
+                }
+            }
+            glClear(GL_COLOR_BUFFER_BIT);
+            program.setProjectionMatrix(projectionMatrix);
+            program.setViewMatrix(viewMatrix);
+            drawTexture(&program, &obj); //, 7.0f);
+            glDisableVertexAttribArray(program.positionAttribute);
+            glDisableVertexAttribArray(program.texCoordAttribute);
+            SDL_GL_SwapWindow(displayWindow);
+        }
+    }
+    SDL_Quit();
+}
+
+void gameOver()
+{
+    SDL_Init(SDL_INIT_VIDEO);
+    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+    SDL_GL_MakeCurrent(displayWindow, context);
+#ifdef _WINDOWS
+    glewInit();
+#endif
+    
+    SDL_Event event;
+    bool done = false;
+    glViewport(0, 0, 1280, 720);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    
+    Matrix projectionMatrix;
+    Matrix viewMatrix;
+    
+    GLuint i = LoadTexture("/Images/gameOver.png");
+    texturedObject obj(i, 1.0f, 1.0f, Vec2D(0.0f,0.0f), 20.0f);
+    
+    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+                done = true;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    done = true;
+                }
+            }
+            glClear(GL_COLOR_BUFFER_BIT);
+            program.setProjectionMatrix(projectionMatrix);
+            program.setViewMatrix(viewMatrix);
+            drawTexture(&program, &obj); //, 7.0f);
+            glDisableVertexAttribArray(program.positionAttribute);
+            glDisableVertexAttribArray(program.texCoordAttribute);
+            SDL_GL_SwapWindow(displayWindow);
+        }
+    }
+    SDL_Quit();
+}
+
 void selectState()
 {
-    const Uint8* key = SDL_GetKeyboardState(NULL);
-    if (key[SDL_SCANCODE_SPACE]) {
-        state = GameState::Level;
-    }
-    switch (state) {
-        case GameState::MainMenu:
-            mainMenu();
-            
-        case GameState::Level:
-            levelState();
-            break;
+    bool done = false;
+    while (!done) {
+        switch (state) {
+            case GameState::MainMenu:
+                mainMenu();
+            case GameState::Level:
+                levelState();
+                break;
+            case GameState::Win:
+                victory();
+                done = true;
+                break;
+            case GameState::GameOver:
+                gameOver();
+                done = true;
+                break;
+        }
     }
 }
 
