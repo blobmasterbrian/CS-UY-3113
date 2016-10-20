@@ -381,11 +381,17 @@ void levelState()
                     done = true;
                     break;
                 }
-                
-                if (enemies[rowmost[k/15][rowmost[k/15].size()-1]]->position.x <= -13.5f || enemies[rowmost[k/15][0]]->position.x >= 10.0f) {
+                if (enemies[rowmost[k/15][rowmost[k/15].size()-1]]->position.x <= -13.5f) {
+                    enemies[k]->position.x += fabsf(enemies[rowmost[k/15][rowmost[k/15].size()-1]]->position.x + 13.5f);
                     enemies[k]->velocity.x = -enemies[k]->velocity.x;
                     enemies[k]->position.y -= 10.0f * elapsed;
                 }
+                if (enemies[rowmost[k/15][0]]->position.x >= 10.0f) {
+                    enemies[k]->position.x -= fabsf(enemies[rowmost[k/15][0]]->position.x - 10.0f);
+                    enemies[k]->velocity.x = -enemies[k]->velocity.x;
+                    enemies[k]->position.y -= 10.0f * elapsed;
+                }
+                
                 enemies[k]->update(elapsed);
                 drawTexture(&program, enemies[k]); //, 1.3f);
                 if (enemies[k]->index == 85 || enemies[k]->index == 86) {
@@ -398,9 +404,9 @@ void levelState()
                     for (int g = rowmost[k/15][0]; g <= rowmost[k/15][rowmost[k/15].size()]; g++) {
                         if (enemies[g] != nullptr) {
                             if (enemies[g]->velocity.x > 0) {
-                                enemies[g]->velocity.x += 0.35;
+                                enemies[g]->velocity.x += 0.5;  // difficulty setting
                             } else {
-                                enemies[g]->velocity.x -= 0.35;
+                                enemies[g]->velocity.x -= 0.5;  // difficulty setting
                             }
                         }
                     }
@@ -412,7 +418,7 @@ void levelState()
         }
         for (size_t k = 0; k < 14; k++) {
             int shoot = rand();
-            if (shoot % 313 == 0 && frontmost[k].size() > 0) {
+            if (shoot % 571 == 0 && frontmost[k].size() > 0) {  // difficulty setting
                 Vec2D vec(enemies[*(frontmost[k].end()-1)]->position.x - 0.15f,
                           enemies[*(frontmost[k].end()-1)]->position.y -
                           enemies[*(frontmost[k].end()-1)]->height*enemies[*(frontmost[k].end()-1)]->scale/2.0f);
@@ -553,7 +559,7 @@ void victory()
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
                     done = true;
                 }
             }
@@ -602,7 +608,7 @@ void gameOver()
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
                     done = true;
                 }
             }
