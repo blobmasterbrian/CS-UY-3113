@@ -467,21 +467,22 @@ void levelState()
                             if (score[0]->index == 57) {
                                 if (score[1]->index == 57) {
                                     if (score[2]->index == 57) {
-                                        score[3]->setSpriteCoords(++score[3]->index);
+                                        score[3]->setSpriteCoords(
+                                                                  score[3]->index+=3);
                                         score[2]->index = 48;
                                         score[2]->setSpriteCoords(48);
                                     } else {
-                                        score[2]->setSpriteCoords(++score[2]->index);
+                                        score[2]->setSpriteCoords(score[2]->index+=3);
                                     }
                                     score[1]->index = 48;
                                     score[1]->setSpriteCoords(48);
                                 } else {
-                                    score[1]->setSpriteCoords(++score[1]->index);
+                                    score[1]->setSpriteCoords(score[1]->index+=3);
                                 }
                                 score[0]->index = 48;
                                 score[0]->setSpriteCoords(48);
                             } else {
-                                score[0]->setSpriteCoords(++score[0]->index);
+                                score[0]->setSpriteCoords(score[0]->index+=3);
                             }
                         }
                     }
@@ -490,14 +491,14 @@ void levelState()
         }
         
         for (size_t b = 0; b < enemyBullets.size(); b++) {
-                if(enemyBullets[b]->position.y + enemyBullets[b]->height*enemyBullets[b]->scale/2.0f >  // Enemy Bullet Top
-                   player.position.y - player.height*player.scale/2.0f &&                               // Player Bottom
+                if(enemyBullets[b]->position.y - enemyBullets[b]->height*enemyBullets[b]->scale/2.0f <  // Enemy Bullet Bottom
+                   player.position.y + player.height*player.scale/2.0f &&                               // Player Top
                    enemyBullets[b]->position.x + enemyBullets[b]->width*enemyBullets[b]->scale/2.0f >   // Enemy Bullet Right
                    player.position.x - player.width*player.scale/2.0f &&                                // Player Left
                    enemyBullets[b]->position.x - enemyBullets[b]->width*enemyBullets[b]->scale/2.0f <   // Enemy Bullet Left
                    player.position.x + player.width*player.scale/2.0f &&                                // Player Right
-                   enemyBullets[b]->position.y - enemyBullets[b]->height*enemyBullets[b]->scale/2.0f <  // Enemy Bullet Bottom
-                   player.position.y + player.height*player.scale/2.0f) {                               // Player Top
+                   enemyBullets[b]->position.y + enemyBullets[b]->height*enemyBullets[b]->scale/2.0f >  // Enemy Bullet Top
+                   player.position.y - player.height*player.scale/2.0f) {                               // Player Bottom
                     
                     delete enemyBullets[b];
                     enemyBullets[b] = nullptr;
