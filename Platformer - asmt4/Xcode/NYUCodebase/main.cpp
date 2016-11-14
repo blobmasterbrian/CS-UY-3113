@@ -152,6 +152,8 @@ void levelState()
         Level level;
         level.program = &program;
         level.levelTexture = maptex;
+        level.xsprites = 8;
+        level.ysprites = 3;
         level.createMap();
         level.drawMap();
         

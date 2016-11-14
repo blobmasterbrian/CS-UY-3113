@@ -7,6 +7,8 @@ orientation=orthogonal
 
 [tilesets]
 tileset=platformertiles.png,32,32,0,0
+tileset=../../../../../CS3113/assets/sprite_sheets/characters_1.png,16,16,0,0
+tileset=../../../../../CS3113/assets/sprite_sheets/characters_3.png,32,32,0,0
 
 [layer]
 type=Tile Layer 1

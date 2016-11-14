@@ -11,7 +11,7 @@ using namespace std;
 
 void Level::createMap()
 {
-    ifstream gamedata("gamedata.txt");
+    ifstream gamedata("/Images/gamedata.txt");
     string line;
     while (getline(gamedata, line)) {
         if (line == "[header]") {
@@ -24,7 +24,7 @@ void Level::createMap()
         }
     }
 }
-    
+
 bool Level::readHeader(ifstream& input)
 {
     string line;
@@ -78,7 +78,7 @@ bool Level::readLayerData(ifstream& input)
 
         if (key == "data") {
             for (size_t y = 0; y < mapHeight; ++y) {
-                getline(sstream, line);
+                getline(input, line);
                 istringstream tileStream(line);
                 string tile;
 
@@ -96,7 +96,7 @@ bool Level::readLayerData(ifstream& input)
     }
     return true;
 }
-    
+
 bool Level::readEntityData(ifstream& input)
 {
     string line;
