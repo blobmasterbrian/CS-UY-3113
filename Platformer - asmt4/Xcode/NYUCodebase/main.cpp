@@ -156,6 +156,18 @@ void levelState()
         level.ysprites = 3;
         level.createMap();
         level.drawMap();
+        for (size_t i = 0; i < level.entities.size(); ++i) {
+            float fixedElapsed = elapsed;
+            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
+                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+            }
+            while (fixedElapsed >= FIXED_TIMESTEP) {
+                fixedElapsed -= FIXED_TIMESTEP;
+                level.entities[i]->update(FIXED_TIMESTEP);
+            }
+            level.entities[i]->update(fixedElapsed);
+            level.entities[i]->render(&program);
+        }
         
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);
@@ -261,6 +273,7 @@ void selectState()
         switch (state) {
             case GameState::MainMenu:
                 mainMenu();
+                break;
             case GameState::Level:
                 levelState();
                 break;

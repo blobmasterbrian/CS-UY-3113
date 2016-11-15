@@ -32,6 +32,7 @@ struct Level {
     int** levelData;
     vector<float>* vertexData;
     vector<float>* textureData;
+    vector<Entity*> entities;
     Matrix levelMatrix;
     ShaderProgram* program;
     
@@ -40,8 +41,8 @@ struct Level {
     bool readLayerData(ifstream& input);
     bool readEntityData(ifstream& input);
     void drawMap();
+    
+    void placeEntity(string& type, float xCoordinate, float yCoordinate);
 };
-
-void placeEntity(string& type, float xCoordinate, float yCoordinate);
 
 #endif /* gamestate_hpp */

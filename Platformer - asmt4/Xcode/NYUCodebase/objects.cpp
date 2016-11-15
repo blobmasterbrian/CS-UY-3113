@@ -7,3 +7,7 @@
 //
 
 #include "objects.hpp"
+
+Entity::Entity(string& type, float xCoordinate, float yCoordinate) {}
+
+Player::Player(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate), horizontalNum(8), verticalNum(4), index(9) {kind = EntityType::Player;}

@@ -173,9 +173,17 @@ void Level::drawMap()
     glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertexData->size() / 2));
 }
 
-void placeEntity(string& type, float xCoordinate, float yCoordinate)
+void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
 {
-    
+    Entity* entity;
+    if (type == "Player") {
+        entity = new Player(type, xCoordinate, yCoordinate);
+    } else if (type == "Enemy") {
+        entity = new Enemy(type, xCoordinate, yCoordinate);
+    } else {
+        entity = new Object(type, xCoordinate, yCoordinate);
+    }
+    entities.push_back(entity);
 }
 
 
