@@ -9,9 +9,11 @@
 #include "gamestate.hpp"
 using namespace std;
 
+Level::Level() {vertexData = new vector<float>; textureData = new vector<float>;}
+
 void Level::createMap()
 {
-    ifstream gamedata("/Images/gamedata.txt");
+    ifstream gamedata("NYUCodebase.app/Contents/Resources/Images/gamedata.txt");
     string line;
     while (getline(gamedata, line)) {
         if (line == "[header]") {
@@ -131,26 +133,27 @@ bool Level::readEntityData(ifstream& input)
 
 void Level::drawMap()
 {
-    triangles = 0;
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
+            if (levelData[y][x] == 0)
+                {continue;}
             float u = static_cast<float>((static_cast<int>(levelData[y][x]) % xsprites) / static_cast<float>(xsprites));
             float v = static_cast<float>((static_cast<int>(levelData[y][x]) / xsprites) / static_cast<float>(ysprites));
             float spriteWidth = 1.0f / static_cast<float>(xsprites);
             float spriteHeight = 1.0f / static_cast<float>(ysprites);
             
 
-            vertexData.insert(vertexData.end(), {
-                tileSizeX * x, -tileSizeY * y,
-                tileSizeX * x, (-tileSizeY * y) - tileSizeY,
-                (tileSizeX * x) + tileSizeX, (-tileSizeY * y) - tileSizeY,
+            vertexData->insert(vertexData->end(), {
+                static_cast<float>(tileSizeX * x * 1), static_cast<float>(-tileSizeY * y * 1),
+                static_cast<float>(tileSizeX * x * 1), static_cast<float>(((-tileSizeY * y) - tileSizeY) * 1),
+                static_cast<float>(((tileSizeX * x) + tileSizeX) * 1), static_cast<float>(((-tileSizeY * y) - tileSizeY) * 1),
                 
-                tileSizeX * x, -tileSizeY * y,
-                (tileSizeX * x) + tileSizeX, (-tileSizeY * y) - tileSizeY,
-                (tileSizeX * x) + tileSizeX, -tileSizeY * y
+                static_cast<float>(tileSizeX * x * 1), static_cast<float>(-tileSizeY * y * 1),
+                static_cast<float>(((tileSizeX * x) + tileSizeX) * 1), static_cast<float>(((-tileSizeY * y) - tileSizeY) * 1),
+                static_cast<float>(((tileSizeX * x) + tileSizeX) * 1), static_cast<float>(-tileSizeY * y * 1)
             });
             
-            textureData.insert(textureData.end(), {
+            textureData->insert(textureData->end(), {
                 u, v,
                 u, v + spriteHeight,
                 u + spriteWidth, v + spriteHeight,
@@ -159,17 +162,49 @@ void Level::drawMap()
                 u + spriteWidth, v + spriteHeight,
                 u + spriteWidth, v
             });
-            triangles += 6;
         }
     }
     program->setModelMatrix(levelMatrix);
-    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, &vertexData);
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData);
     glEnableVertexAttribArray(program->positionAttribute);
     levelMatrix.identity();
     glBindTexture(GL_TEXTURE_2D, levelTexture);
-    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, &textureData);
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, textureData);
     glEnableVertexAttribArray(program->texCoordAttribute);
-    glDrawArrays(GL_TRIANGLES, 0, triangles);
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertexData->size() / 2));
+    
+//    program->setModelMatrix(levelMatrix);
+//    float vertices[] = {
+//        -0.5f * 2, -0.5f * 2, // Triangle 1 Coord A
+//        0.5f * 2, -0.5f * 2,  // Triangle 1 Coord B
+//        0.5f * 2, 0.5f * 2,   // Triangle 1 Coord C
+//        -0.5f * 2, -0.5f * 2, // Triangle 2 Coord A
+//        0.5f * 2, 0.5f * 2,   // Triangle 2 Coord B
+//        -0.5f * 2, 0.5f * 2   // Triangle 2 Coord C
+//    };
+//    
+//    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+//    glEnableVertexAttribArray(program->positionAttribute);
+//    levelMatrix.identity();
+//    
+//    float u = static_cast<float>((static_cast<int>(3) % xsprites) / static_cast<float>(xsprites));
+//    float v = static_cast<float>((static_cast<int>(3) / xsprites) / static_cast<float>(ysprites));
+//    float spriteWidth = 1.0f / static_cast<float>(xsprites);
+//    float spriteHeight = 1.0f / static_cast<float>(ysprites);
+//    
+//    glBindTexture(GL_TEXTURE_2D, levelTexture);
+//    float texCoords[] = {
+//        u, v + spriteHeight,
+//        u + spriteWidth, v + spriteHeight,
+//        u + spriteWidth, v,
+//        
+//        u, v + spriteHeight,
+//        u + spriteWidth, v,
+//        u, v
+//    };
+//    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+//    glEnableVertexAttribArray(program->texCoordAttribute);
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void placeEntity(string& type, float xCoordinate, float yCoordinate)

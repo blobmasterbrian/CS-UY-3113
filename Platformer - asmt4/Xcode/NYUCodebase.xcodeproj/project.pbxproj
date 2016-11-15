@@ -168,7 +168,8 @@
 				1A6948BB1DD8D65400263DE1 /* gamestate.hpp */,
 			);
 			name = Code;
-			sourceTree = "<group>";
+			path = "/Users/BrianQuinn/Documents/NYU/Junior 2016/CS-UY 3113/CS-UY-3113/Platformer - asmt4/Xcode/NYUCodebase";
+			sourceTree = "<absolute>";
 		};
 /* End PBXGroup section */
 

@@ -21,17 +21,17 @@ using namespace std;
 enum class GameState {MainMenu, Level, Win, GameOver};
 
 struct Level {
+    Level();
     int mapWidth;
     int mapHeight;
     float tileSizeX;
     float tileSizeY;
     int xsprites;
     int ysprites;
-    int triangles;
     GLuint levelTexture;
     unsigned char** levelData;
-    vector<float> vertexData;
-    vector<float> textureData;
+    vector<float>* vertexData;
+    vector<float>* textureData;
     Matrix levelMatrix;
     ShaderProgram* program;
     

@@ -119,7 +119,7 @@ void levelState()
     Matrix viewMatrix;
     const Uint8 *keys = SDL_GetKeyboardState(NULL);
     
-    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+    projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
     glUseProgram(program.programID);
     
     while (!done) {
@@ -133,7 +133,7 @@ void levelState()
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
                 }
             }
         }
