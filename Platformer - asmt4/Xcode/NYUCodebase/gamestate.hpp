@@ -29,7 +29,7 @@ struct Level {
     int xsprites;
     int ysprites;
     GLuint levelTexture;
-    unsigned char** levelData;
+    int** levelData;
     vector<float>* vertexData;
     vector<float>* textureData;
     Matrix levelMatrix;
