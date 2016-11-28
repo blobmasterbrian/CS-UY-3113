@@ -14,17 +14,23 @@
 
 using namespace std;
 
-enum class EntityType {Player, Enemy, Object, Platform, Intangible};
+enum class EntityType {Player, Skeleton, Bat, Spider, Blob};
 
 struct Entity
 {
     EntityType kind;
-    GLuint textureID;
     Matrix modelMatrix;
+    
+    GLuint textureID;
+    
     float u;
     float v;
     float height;
     float width;
+    int tileX;
+    int tileY;
+    bool gravity;
+    
     pair<float,float> position;
     pair<float,float> velocity;
     pair <float,float> acceleration;
@@ -39,7 +45,7 @@ struct Entity
 
 struct Player : Entity
 {
-    Matrix playerView;
+//    Matrix playerView;
     int index;
     int horizontalNum;
     int verticalNum;
@@ -53,11 +59,19 @@ struct Player : Entity
 
 struct Enemy : Entity
 {
+    int index;
+    int horizontalNum;
+    int verticalNum;
+    
     Enemy(string& type, float xCoordinate, float yCoordinate);
 };
 
 struct Object : Entity
 {
+    int index;
+    int horizontalNum;
+    int verticalNum;
+    
     Object(string& type, float xCoordinate, float yCoordinate);
 };
 

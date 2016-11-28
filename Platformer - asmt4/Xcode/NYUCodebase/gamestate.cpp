@@ -90,7 +90,7 @@ bool Level::readLayerData(ifstream& input)
                     if (val > 0) {
                         levelData[y][x] = val - 1;
                     } else {
-                        levelData[y][x] = 0;
+                        levelData[y][x] = -1;
                     }
                 }
             }
@@ -122,8 +122,8 @@ bool Level::readEntityData(ifstream& input)
             getline(entityStream, xPosition, ',');
             getline(entityStream, yPosition, ',');
 
-            float placeX = static_cast<float>(stoi(xPosition) * tileSizeX);
-            float placeY = static_cast<float>(stoi(yPosition) * -tileSizeY);
+            float placeX = static_cast<float>(stoi(xPosition) * tileSizeX * 0.1f);
+            float placeY = static_cast<float>(stoi(yPosition) * -tileSizeY * 0.1f);
 
             placeEntity(type, placeX, placeY);
         }
@@ -135,7 +135,7 @@ void Level::drawMap()
 {
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
-            if (levelData[y][x] == 0)
+            if (levelData[y][x] == -1)
                 {continue;}
             float u = static_cast<float>(static_cast<int>(levelData[y][x]) % xsprites) / static_cast<float>(xsprites);
             float v = static_cast<float>(static_cast<int>(levelData[y][x]) / xsprites) / static_cast<float>(ysprites);
@@ -177,7 +177,8 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
 {
     Entity* entity;
     if (type == "Player") {
-        entity = &Player::getInstance(type, xCoordinate, yCoordinate); //new Player(type, xCoordinate, yCoordinate);
+        player = &Player::getInstance(type, xCoordinate, yCoordinate); //new Player(type, xCoordinate, yCoordinate);
+        entity = player;
     } else if (type == "Enemy") {
         entity = new Enemy(type, xCoordinate, yCoordinate);
     } else {

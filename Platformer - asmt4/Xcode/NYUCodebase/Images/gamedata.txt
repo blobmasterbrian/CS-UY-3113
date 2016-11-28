@@ -29,3 +29,33 @@ data=
 0,9,10,10,10,11,0,0,0,9,10,10,10,10,10,10,10,10,11,0,9,10,10,10,11,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
+[ObjectsLayer]
+# E3
+type=Skeleton
+location=18,5,0,0
+
+[ObjectsLayer]
+# E2
+type=Skeleton
+location=14,9,0,0
+
+[ObjectsLayer]
+# E1
+type=Player
+location=1,9,1,1
+
+[ObjectsLayer]
+# E4
+type=Bat
+location=11,8,0,0
+
+[ObjectsLayer]
+# E5
+type=Blob
+location=21,9,0,0
+
+[ObjectsLayer]
+# E6
+type=Spider
+location=17,6,0,0
+

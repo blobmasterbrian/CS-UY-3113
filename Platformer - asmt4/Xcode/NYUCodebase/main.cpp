@@ -155,6 +155,7 @@ void levelState()
         level.xsprites = 8;
         level.ysprites = 3;
         level.createMap();
+//        program.setViewMatrix(level.player->playerView);
         level.drawMap();
 //        for (size_t i = 0; i < level.entities.size(); ++i) {
 //            float fixedElapsed = elapsed;
@@ -168,6 +169,8 @@ void levelState()
 //            level.entities[i]->update(fixedElapsed);
 //            level.entities[i]->render(&program);
 //        }
+        viewMatrix.identity();
+        viewMatrix.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
         
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);

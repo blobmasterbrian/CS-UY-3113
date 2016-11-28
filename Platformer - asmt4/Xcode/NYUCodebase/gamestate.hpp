@@ -28,11 +28,13 @@ struct Level {
     float tileSizeY;
     int xsprites;
     int ysprites;
+    
     GLuint levelTexture;
     int** levelData;
     vector<float>* vertexData;
     vector<float>* textureData;
     vector<Entity*> entities;
+    Player* player;
     Matrix levelMatrix;
     ShaderProgram* program;
     

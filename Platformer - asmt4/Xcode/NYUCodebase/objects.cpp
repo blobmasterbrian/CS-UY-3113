@@ -8,7 +8,7 @@
 
 #include "objects.hpp"
 
-Entity::Entity(string& type, float xCoordinate, float yCoordinate) {}
+Entity::Entity(string& type, float xCoordinate, float yCoordinate): position(xCoordinate, yCoordinate) {}
 
 Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
 {
@@ -16,11 +16,27 @@ Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
     return instance;
 }
 
-Player::Player(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate), horizontalNum(8), verticalNum(4), index(9) {kind = EntityType::Player;}
+Player::Player(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate), horizontalNum(8), verticalNum(4), index(9)
+{
+    kind = EntityType::Player;
+    gravity = true;
+}
 
 Enemy::Enemy(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate)
 {
-    
+    if (type == "Skeleton") {
+        kind = EntityType::Skeleton;
+        gravity = true;
+    } else if (type == "Bat") {
+        kind = EntityType::Bat;
+        gravity = false;
+    } else if (type == "Spider") {
+        kind = EntityType::Spider;
+        gravity = true;
+    } else if (type == "Blob") {
+        kind = EntityType::Blob;
+        gravity = true;
+    }
 }
 
 Object::Object(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate) {}
