@@ -44,7 +44,11 @@ struct Player : Entity
     int horizontalNum;
     int verticalNum;
     
+    static Player& getInstance(string& type, float xCoordinate, float yCoordinate);
+    
     Player(string& type, float xCoordinate, float yCoordinate);
+    Player& operator=(const Player&) = delete;
+    Player(const Player&) = delete;
 };
 
 struct Enemy : Entity

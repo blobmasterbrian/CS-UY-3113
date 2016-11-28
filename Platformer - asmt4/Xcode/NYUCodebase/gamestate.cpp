@@ -177,7 +177,7 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
 {
     Entity* entity;
     if (type == "Player") {
-        entity = new Player(type, xCoordinate, yCoordinate);
+        entity = &Player::getInstance(type, xCoordinate, yCoordinate); //new Player(type, xCoordinate, yCoordinate);
     } else if (type == "Enemy") {
         entity = new Enemy(type, xCoordinate, yCoordinate);
     } else {
