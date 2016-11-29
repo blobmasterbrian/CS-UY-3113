@@ -161,11 +161,11 @@
 				6DEF23BE1B96CC2600BCE792 /* ShaderProgram.cpp */,
 				6DEF23BF1B96CC2600BCE792 /* ShaderProgram.h */,
 				6DEF23C01B96CC2600BCE792 /* vertex.glsl */,
-				6D5A86B919AE5C710066C1FD /* main.cpp */,
 				1A6948B71DD8D62500263DE1 /* objects.cpp */,
 				1A6948B81DD8D62500263DE1 /* objects.hpp */,
 				1A6948BA1DD8D65400263DE1 /* gamestate.cpp */,
 				1A6948BB1DD8D65400263DE1 /* gamestate.hpp */,
+				6D5A86B919AE5C710066C1FD /* main.cpp */,
 			);
 			name = Code;
 			path = "/Users/BrianQuinn/Documents/NYU/Junior 2016/CS-UY 3113/CS-UY-3113/Platformer - asmt4/Xcode/NYUCodebase";

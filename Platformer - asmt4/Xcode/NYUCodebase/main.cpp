@@ -51,48 +51,48 @@ GameState state = GameState::Level;
 
 void mainMenu()
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
-    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
-    SDL_GL_MakeCurrent(displayWindow, context);
-#ifdef _WINDOWS
-    glewInit();
-#endif
-    
-    SDL_Event event;
-    bool done = false;
-    glViewport(0, 0, 1280, 720);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    
-    Matrix projectionMatrix;
-    Matrix viewMatrix;
-    
-    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
-    glUseProgram(program.programID);
-    
-    while (!done) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-                done = true;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-                    state = GameState::Level;
-                    done = true;
-                }
-            }
-        glClear(GL_COLOR_BUFFER_BIT);
-        program.setProjectionMatrix(projectionMatrix);
-        program.setViewMatrix(viewMatrix);
-        glDisableVertexAttribArray(program.positionAttribute);
-        glDisableVertexAttribArray(program.texCoordAttribute);
-        SDL_GL_SwapWindow(displayWindow);
-        }
-    }
-    SDL_Quit();
+//    SDL_Init(SDL_INIT_VIDEO);
+//    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+//    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+//    SDL_GL_MakeCurrent(displayWindow, context);
+//#ifdef _WINDOWS
+//    glewInit();
+//#endif
+//    
+//    SDL_Event event;
+//    bool done = false;
+//    glViewport(0, 0, 1280, 720);
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    
+//    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+//    
+//    Matrix projectionMatrix;
+//    Matrix viewMatrix;
+//    
+//    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+//    glUseProgram(program.programID);
+//    
+//    while (!done) {
+//        while (SDL_PollEvent(&event)) {
+//            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+//                done = true;
+//            }
+//            if (event.type == SDL_KEYDOWN) {
+//                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+//                    state = GameState::Level;
+//                    done = true;
+//                }
+//            }
+//        glClear(GL_COLOR_BUFFER_BIT);
+//        program.setProjectionMatrix(projectionMatrix);
+//        program.setViewMatrix(viewMatrix);
+//        glDisableVertexAttribArray(program.positionAttribute);
+//        glDisableVertexAttribArray(program.texCoordAttribute);
+//        SDL_GL_SwapWindow(displayWindow);
+//        }
+//    }
+//    SDL_Quit();
 }
 
 void levelState()
@@ -157,20 +157,60 @@ void levelState()
         level.createMap();
 //        program.setViewMatrix(level.player->playerView);
         level.drawMap();
-//        for (size_t i = 0; i < level.entities.size(); ++i) {
-//            float fixedElapsed = elapsed;
-//            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
-//                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
-//            }
-//            while (fixedElapsed >= FIXED_TIMESTEP) {
-//                fixedElapsed -= FIXED_TIMESTEP;
+        
+        for (size_t i = 0; i < level.entities.size(); ++i) {
+            float fixedElapsed = elapsed;
+            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
+                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+            }
+            while (fixedElapsed >= FIXED_TIMESTEP) {
+                fixedElapsed -= FIXED_TIMESTEP;
 //                level.entities[i]->update(FIXED_TIMESTEP);
-//            }
+            }
 //            level.entities[i]->update(fixedElapsed);
-//            level.entities[i]->render(&program);
-//        }
+            level.entities[i]->render(&program);
+        }
+        
+        Matrix mtx;
+        GLuint tex = LoadTexture("/Images/characters_3.png");
+        
+        program.setModelMatrix(mtx);
+        float scale = level.player->scale;
+        float aspect = level.player->width/level.player->height;
+        float u = level.player->u;
+        float v = level.player->v;
+        float spriteX = level.player->spriteX;
+        float spriteY = level.player->spriteY;
+        
+        float vertices[] = {
+            -1.5f, -1.5f, // Triangle 1 Coord A
+            1.5f, -1.5f,  // Triangle 1 Coord B
+            1.5f, 1.5f,   // Triangle 1 Coord C
+            -1.5f, -1.5f, // Triangle 2 Coord A
+            1.5f, 1.5f,   // Triangle 2 Coord B
+            -1.5f, 1.5f   // Triangle 2 Coord C
+        };
+        
+        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        glEnableVertexAttribArray(program.positionAttribute);
+        mtx.identity();
+        mtx.Translate(10.0f, 10.0f, 0);
+        
+        glBindTexture(GL_TEXTURE_2D, tex);
+        float texCoords[] = {
+            u, v + spriteY,
+            u + spriteX, v + spriteY,
+            u + spriteX, v,
+            u, v + spriteY,
+            u + spriteX, v,
+            u, v
+        };
+        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+        glEnableVertexAttribArray(program.texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
         viewMatrix.identity();
-        viewMatrix.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
+//        viewMatrix.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
         
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);
@@ -181,92 +221,92 @@ void levelState()
 
 void victory()
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
-    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
-    SDL_GL_MakeCurrent(displayWindow, context);
-#ifdef _WINDOWS
-    glewInit();
-#endif
-    
-    SDL_Event event;
-    bool done = false;
-    glViewport(0, 0, 1280, 720);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    
-    Matrix projectionMatrix;
-    Matrix viewMatrix;
-    
-    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
-    glUseProgram(program.programID);
-    
-    while (!done) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-                done = true;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-                    done = true;
-                }
-            }
-            glClear(GL_COLOR_BUFFER_BIT);
-            program.setProjectionMatrix(projectionMatrix);
-            program.setViewMatrix(viewMatrix);
-            glDisableVertexAttribArray(program.positionAttribute);
-            glDisableVertexAttribArray(program.texCoordAttribute);
-            SDL_GL_SwapWindow(displayWindow);
-        }
-    }
-    SDL_Quit();
+//    SDL_Init(SDL_INIT_VIDEO);
+//    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+//    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+//    SDL_GL_MakeCurrent(displayWindow, context);
+//#ifdef _WINDOWS
+//    glewInit();
+//#endif
+//    
+//    SDL_Event event;
+//    bool done = false;
+//    glViewport(0, 0, 1280, 720);
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    
+//    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+//    
+//    Matrix projectionMatrix;
+//    Matrix viewMatrix;
+//    
+//    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+//    glUseProgram(program.programID);
+//    
+//    while (!done) {
+//        while (SDL_PollEvent(&event)) {
+//            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+//                done = true;
+//            }
+//            if (event.type == SDL_KEYDOWN) {
+//                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+//                    done = true;
+//                }
+//            }
+//            glClear(GL_COLOR_BUFFER_BIT);
+//            program.setProjectionMatrix(projectionMatrix);
+//            program.setViewMatrix(viewMatrix);
+//            glDisableVertexAttribArray(program.positionAttribute);
+//            glDisableVertexAttribArray(program.texCoordAttribute);
+//            SDL_GL_SwapWindow(displayWindow);
+//        }
+//    }
+//    SDL_Quit();
 }
 
 void gameOver()
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
-    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
-    SDL_GL_MakeCurrent(displayWindow, context);
-#ifdef _WINDOWS
-    glewInit();
-#endif
-    
-    SDL_Event event;
-    bool done = false;
-    glViewport(0, 0, 1280, 720);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    
-    Matrix projectionMatrix;
-    Matrix viewMatrix;
-    
-    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
-    glUseProgram(program.programID);
-    
-    while (!done) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-                done = true;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-                    done = true;
-                }
-            }
-            glClear(GL_COLOR_BUFFER_BIT);
-            program.setProjectionMatrix(projectionMatrix);
-            program.setViewMatrix(viewMatrix);
-            glDisableVertexAttribArray(program.positionAttribute);
-            glDisableVertexAttribArray(program.texCoordAttribute);
-            SDL_GL_SwapWindow(displayWindow);
-        }
-    }
-    SDL_Quit();
+//    SDL_Init(SDL_INIT_VIDEO);
+//    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+//    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+//    SDL_GL_MakeCurrent(displayWindow, context);
+//#ifdef _WINDOWS
+//    glewInit();
+//#endif
+//    
+//    SDL_Event event;
+//    bool done = false;
+//    glViewport(0, 0, 1280, 720);
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    
+//    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+//    
+//    Matrix projectionMatrix;
+//    Matrix viewMatrix;
+//    
+//    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
+//    glUseProgram(program.programID);
+//    
+//    while (!done) {
+//        while (SDL_PollEvent(&event)) {
+//            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+//                done = true;
+//            }
+//            if (event.type == SDL_KEYDOWN) {
+//                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+//                    done = true;
+//                }
+//            }
+//            glClear(GL_COLOR_BUFFER_BIT);
+//            program.setProjectionMatrix(projectionMatrix);
+//            program.setViewMatrix(viewMatrix);
+//            glDisableVertexAttribArray(program.positionAttribute);
+//            glDisableVertexAttribArray(program.texCoordAttribute);
+//            SDL_GL_SwapWindow(displayWindow);
+//        }
+//    }
+//    SDL_Quit();
 }
 
 void selectState()

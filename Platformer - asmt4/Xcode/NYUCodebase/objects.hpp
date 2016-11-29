@@ -16,27 +16,34 @@ using namespace std;
 
 enum class EntityType {Player, Skeleton, Bat, Spider, Blob};
 
+GLuint LoadTexture(const char* image_path);
+
 struct Entity
 {
     EntityType kind;
     Matrix modelMatrix;
     
     GLuint textureID;
+    int index;
+    int horizontalNum;
+    int verticalNum;
+    float spriteX;
+    float spriteY;
     
     float u;
     float v;
     float height;
     float width;
-    int tileX;
-    int tileY;
+    float scale;
     bool gravity;
     
     pair<float,float> position;
     pair<float,float> velocity;
     pair <float,float> acceleration;
     
-    Entity(string& type, float xCoordinate, float yCoordinate);
+    Entity(string& type, float xCoordinate, float yCoordinate, int idx, int xSprites, int ySprites, float scale = 1.0f);
     
+    void setSpriteCoords(int index);
     void update(float elapsed);
     void render(ShaderProgram* program);
     bool collision(Entity* entity);
@@ -46,10 +53,6 @@ struct Entity
 struct Player : Entity
 {
 //    Matrix playerView;
-    int index;
-    int horizontalNum;
-    int verticalNum;
-    
     static Player& getInstance(string& type, float xCoordinate, float yCoordinate);
     
     Player(string& type, float xCoordinate, float yCoordinate);
@@ -59,19 +62,11 @@ struct Player : Entity
 
 struct Enemy : Entity
 {
-    int index;
-    int horizontalNum;
-    int verticalNum;
-    
     Enemy(string& type, float xCoordinate, float yCoordinate);
 };
 
 struct Object : Entity
 {
-    int index;
-    int horizontalNum;
-    int verticalNum;
-    
     Object(string& type, float xCoordinate, float yCoordinate);
 };
 

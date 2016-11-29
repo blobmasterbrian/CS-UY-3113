@@ -17,7 +17,6 @@
 #include <vector>
 #include "objects.hpp"
 
-using namespace std;
 enum class GameState {MainMenu, Level, Win, GameOver};
 
 struct Level {
