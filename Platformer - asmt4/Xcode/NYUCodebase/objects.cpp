@@ -64,6 +64,7 @@ Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
 
 Player::Player(string& type, float xCoordinate, float yCoordinate): Entity(type, xCoordinate, yCoordinate, 9, 8, 4)
 {
+    textureID = LoadTexture("/Images/characters_3.png");
     kind = EntityType::Player;
     gravity = true;
 }
