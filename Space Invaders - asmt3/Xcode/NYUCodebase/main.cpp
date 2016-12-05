@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include </Library/Frameworks/SDL2_mixer.framework/Headers/SDL_mixer.h>
 #include "ShaderProgram.h"
 #include "Matrix.h"
 #include <random>
@@ -216,7 +217,7 @@ void levelState()
     srand((int)time(NULL));
     
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     Matrix projectionMatrix;
     Matrix viewMatrix;
     
@@ -324,6 +325,11 @@ void levelState()
     
     GLuint lazer = LoadTexture("/Images/laserBlue01.png");
     GLuint enemyLazer = LoadTexture("/Images/laserRed01.png");
+    
+    Mix_Chunk* laser = Mix_LoadWAV("/Sounds/laser.wav");
+    Mix_Chunk* enemyLaser = Mix_LoadWAV("/Sounds/enemylaser.wav");
+    Mix_Chunk* explosion = Mix_LoadWAV("/Sounds/explosion.wav");
+    
     std::vector<texturedObject*> playerBullets;
     std::vector<texturedObject*> enemyBullets;
     
@@ -342,6 +348,7 @@ void levelState()
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    Mix_PlayChannel(-1, laser, 0);
                     texturedObject* bullet = new texturedObject(lazer, 1.0f, 0.1f, Vec2D(player.position.x + 0.15f, player.position.y + 0.3f), 0.5f);
                     bullet->acceleration.y = 50.0f;
                     playerBullets.push_back(bullet);
@@ -419,6 +426,7 @@ void levelState()
         for (size_t k = 0; k < 14; k++) {
             int shoot = rand();
             if (shoot % 571 == 0 && frontmost[k].size() > 0) {  // difficulty setting
+                Mix_PlayChannel(-1, enemyLaser, 0);
                 Vec2D vec(enemies[*(frontmost[k].end()-1)]->position.x - 0.15f,
                           enemies[*(frontmost[k].end()-1)]->position.y -
                           enemies[*(frontmost[k].end()-1)]->height*enemies[*(frontmost[k].end()-1)]->scale/2.0f);
@@ -456,6 +464,7 @@ void levelState()
                            playerBullets[l]->position.y - playerBullets[l]->height*playerBullets[l]->scale/2.0f <   // Bullet Bottom
                            enemies[k]->position.y + enemies[k]->height*enemies[k]->scale/2.0f) {                    // Enemy Top
                         
+                            Mix_PlayChannel(-1, explosion, 0);
                             delete playerBullets[l];
                             playerBullets[l] = nullptr;
                         
@@ -524,6 +533,9 @@ void levelState()
         SDL_GL_SwapWindow(displayWindow);
     }
     
+    Mix_FreeChunk(laser);
+    Mix_FreeChunk(enemyLaser);
+    Mix_FreeChunk(explosion);
     SDL_Quit();
 }
 

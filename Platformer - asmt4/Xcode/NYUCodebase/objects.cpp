@@ -16,6 +16,21 @@ Entity::Entity(string& type, float xCoordinate, float yCoordinate, int idx, int 
     spriteY = 1.0/(float)verticalNum;
 }
 
+void Entity::update(float elapsed)
+{
+    modelMatrix.identity();
+    position.first += velocity.first * elapsed;
+    position.second += velocity.second * elapsed;
+    resolveCollision();
+    velocity.first += acceleration.first * elapsed;
+    velocity.second += acceleration.second * elapsed;
+    lerp(velocity.first, 0.0f, elapsed);
+    lerp(velocity.second, 0.0f, elapsed);
+    lerp(acceleration.first, 0.0f, elapsed);
+    lerp(acceleration.second, 0.0f, elapsed);
+    modelMatrix.Translate(position.first, position.second, 0);
+}
+
 void Entity::render(ShaderProgram* program)
 {
     program->setModelMatrix(modelMatrix);
@@ -31,8 +46,6 @@ void Entity::render(ShaderProgram* program)
     
     glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
     glEnableVertexAttribArray(program->positionAttribute);
-    modelMatrix.identity();
-    modelMatrix.Translate(position.first, position.second, 0);
     
     glBindTexture(GL_TEXTURE_2D, textureID);
     float texCoords[] = {
@@ -46,6 +59,13 @@ void Entity::render(ShaderProgram* program)
     glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
     glEnableVertexAttribArray(program->texCoordAttribute);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
+}
+
+void Entity::resolveCollision()
+{
+    worldToTileCoordinates(position.first, position.second, &gridPosition.first, &gridPosition.second);
 }
 
 void Entity::setSpriteCoords(int index)

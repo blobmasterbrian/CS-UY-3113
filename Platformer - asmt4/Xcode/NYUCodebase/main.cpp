@@ -23,6 +23,9 @@
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
 
+float TILE_SIZEX;
+float TILE_SIZEY;
+
 SDL_Window* displayWindow;
 
 GLuint LoadTexture(const char* image_path)
@@ -46,6 +49,12 @@ GLuint LoadTexture(const char* image_path)
 float lerp(float v0, float v1, float t) {
     return (1.0-t)*v0 + t*v1;
 }
+
+//void worldToTileCoordinates(float worldX, float worldY, int* gridX, int* gridY)
+//{
+//    *gridX = static_cast<int>(worldX / TILE_SIZEY);
+//    *gridY = static_cast<int>(worldY / TILE_SIZEY);
+//}
 
 GameState state = GameState::Level;
 
@@ -148,6 +157,7 @@ void levelState()
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+                    level.player->velocity.second = 2.0f;
                 }
             }
         }
@@ -160,8 +170,8 @@ void levelState()
         glClear(GL_COLOR_BUFFER_BIT);
         
         level.drawMap();
-        GLuint waste = LoadTexture("/Images/characters_3.png");
-        level.player->textureID = waste;
+//        GLuint waste = LoadTexture("/Images/characters_3.png");
+//        level.player->textureID = waste;
         
         for (size_t i = 0; i < level.entities.size(); ++i) {
             float fixedElapsed = elapsed;
@@ -170,52 +180,15 @@ void levelState()
             }
             while (fixedElapsed >= FIXED_TIMESTEP) {
                 fixedElapsed -= FIXED_TIMESTEP;
-//                level.entities[i]->update(FIXED_TIMESTEP);
+                level.entities[i]->update(FIXED_TIMESTEP);
             }
-//            level.entities[i]->update(fixedElapsed);
+            level.entities[i]->update(fixedElapsed);
             level.entities[i]->render(&program);
         }
-        
-//        Matrix mtx;
-//        GLuint tex = LoadTexture("/Images/characters_3.png");
-//        
-//        program.setModelMatrix(mtx);
-//        float scale = level.player->scale;
-//        float aspect = level.player->width/level.player->height;
-//        float u = level.player->u;
-//        float v = level.player->v;
-//        float spriteX = level.player->spriteX;
-//        float spriteY = level.player->spriteY;
-//        
-//        float vertices[] = {
-//            -1.5f * aspect * scale, -1.5f * scale, // Triangle 1 Coord A
-//            1.5f * aspect * scale, -1.5f * scale,  // Triangle 1 Coord B
-//            1.5f * aspect * scale, 1.5f * scale,   // Triangle 1 Coord C
-//            -1.5f * aspect * scale, -1.5f * scale, // Triangle 2 Coord A
-//            1.5f * aspect * scale, 1.5f * scale,   // Triangle 2 Coord B
-//            -1.5f * aspect * scale, 1.5f * scale   // Triangle 2 Coord C
-//        };
-//        
-//        glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-//        glEnableVertexAttribArray(program.positionAttribute);
-//        mtx.identity();
-//        mtx.Translate(10.0f, 10.0f, 0);
-//        
-//        glBindTexture(GL_TEXTURE_2D, tex);
-//        float texCoords[] = {
-//            u, v + spriteY,
-//            u + spriteX, v + spriteY,
-//            u + spriteX, v,
-//            u, v + spriteY,
-//            u + spriteX, v,
-//            u, v
-//        };
-//        glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-//        glEnableVertexAttribArray(program.texCoordAttribute);
-//        glDrawArrays(GL_TRIANGLES, 0, 6);
-        
-        viewMatrix.identity();
-//        viewMatrix.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
+
+        program.setViewMatrix(level.player->playerView);
+        level.player->playerView.identity();
+        level.player->playerView.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
         
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);

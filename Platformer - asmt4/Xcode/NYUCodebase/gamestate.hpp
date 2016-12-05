@@ -17,6 +17,9 @@
 #include <vector>
 #include "objects.hpp"
 
+extern float TILE_SIZEX;
+extern float TILE_SIZEY;
+
 enum class GameState {MainMenu, Level, Win, GameOver};
 
 struct Level {
@@ -45,5 +48,7 @@ struct Level {
     
     void placeEntity(string& type, float xCoordinate, float yCoordinate);
 };
+
+void worldToTileCoordinates(float worldX, float worldY, int* gridX, int* gridY);
 
 #endif /* gamestate_hpp */

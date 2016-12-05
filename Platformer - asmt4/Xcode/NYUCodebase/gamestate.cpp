@@ -49,8 +49,10 @@ bool Level::readHeader(ifstream& input)
             mapHeight = stoi(value);
         } else if (key == "tilewidth") {
             tileSizeX = stoi(value);
+            TILE_SIZEX = tileSizeX * 0.1f;
         }else if (key == "tileheight") {
             tileSizeY = stoi(value);
+            TILE_SIZEY = tileSizeY * 0.1f;
         }
     }
 
@@ -171,6 +173,8 @@ void Level::drawMap()
     glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, textureData->data());
     glEnableVertexAttribArray(program->texCoordAttribute);
     glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertexData->size() / 2));
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
 }
 
 void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
@@ -187,7 +191,11 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
     entities.push_back(entity);
 }
 
-
+void worldToTileCoordinates(float worldX, float worldY, int* gridX, int* gridY)
+{
+    *gridX = static_cast<int>(worldX / TILE_SIZEX);
+    *gridY = static_cast<int>(worldY / TILE_SIZEY);
+}
 
 
 

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1AAA499F1D96F8FD00062961 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 1AAA499E1D96F8FD00062961 /* Images */; };
+		1ABB81CA1DF4F7EA006CA9BD /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ABB81C91DF4F7EA006CA9BD /* SDL2_mixer.framework */; };
+		1ABB81CC1DF4FCBE006CA9BD /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = 1ABB81CB1DF4FCBE006CA9BD /* Sounds */; };
 		6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86AD19AE5C710066C1FD /* Cocoa.framework */; };
 		6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D5A86B619AE5C710066C1FD /* InfoPlist.strings */; };
 		6D5A86BA19AE5C710066C1FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D5A86B919AE5C710066C1FD /* main.cpp */; };
@@ -26,6 +28,8 @@
 
 /* Begin PBXFileReference section */
 		1AAA499E1D96F8FD00062961 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
+		1ABB81C91DF4F7EA006CA9BD /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
+		1ABB81CB1DF4FCBE006CA9BD /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
 		6D5A86AA19AE5C710066C1FD /* NYUCodebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYUCodebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D5A86AD19AE5C710066C1FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D5A86B019AE5C710066C1FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -57,6 +61,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D5AC2D019AE6280004CB1BF /* OpenGL.framework in Frameworks */,
+				1ABB81CA1DF4F7EA006CA9BD /* SDL2_mixer.framework in Frameworks */,
 				6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */,
 				6D5A86E319AE5CD10066C1FD /* SDL2.framework in Frameworks */,
 				6D5AC2D219AE6A1E004CB1BF /* SDL2_image.framework in Frameworks */,
@@ -87,6 +92,7 @@
 		6D5A86AC19AE5C710066C1FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1ABB81C91DF4F7EA006CA9BD /* SDL2_mixer.framework */,
 				6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */,
 				6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */,
 				6D5A86E219AE5CD10066C1FD /* SDL2.framework */,
@@ -109,6 +115,7 @@
 		6D5A86B319AE5C710066C1FD /* NYUCodebase */ = {
 			isa = PBXGroup;
 			children = (
+				1ABB81CB1DF4FCBE006CA9BD /* Sounds */,
 				1AAA499E1D96F8FD00062961 /* Images */,
 				6D5A86E119AE5CAA0066C1FD /* Code */,
 				6D5A86B419AE5C710066C1FD /* Supporting Files */,
@@ -216,6 +223,7 @@
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				6DEF23C11B96CC2600BCE792 /* fragment.glsl in Resources */,
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
+				1ABB81CC1DF4FCBE006CA9BD /* Sounds in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				1AAA499F1D96F8FD00062961 /* Images in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
