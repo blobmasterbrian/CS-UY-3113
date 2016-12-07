@@ -9,14 +9,14 @@
 #include "polygon.hpp"
 
 // Polygons
-Polygon::Polygon(float x, float y, int vertices): position(x,y), vertices(vertices), rotation(static_cast<float>(rand())/(static_cast<float>(RAND_MAX/2.0f)))
+Polygon::Polygon(float x, float y, int vertices): position(x,y), vertices(vertices), rotation(0.0f)//static_cast<float>(rand())/(static_cast<float>(RAND_MAX/2.0f)))
 {
     coordinates = new vector<float>;
     texcoordinates = new vector<float>;
     velocity.first = -2.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.0f - (-2.0f))));
     velocity.second = -2.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.0f - (-2.0f))));
-    rotationSpeed = -0.05f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(0.05f - (-0.05f))));
-    scale = 1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.5f - 1.0f)));
+    rotationSpeed = 0.0f;//-0.05f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(0.05f - (-0.05f))));
+    scale = 1.0f;//1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(3.5f - 1.0f)));
 }
 
 void Polygon::update(float elapsed)

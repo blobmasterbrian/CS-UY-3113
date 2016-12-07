@@ -95,14 +95,19 @@ bool checkCollision(Polygon& object1, Polygon& object2)
     for (size_t i = 0; i < object1.coordinates->size(); i += 2) {
         if ((*object1.coordinates)[i] == 0.0f && (*object1.coordinates)[i+1] == 0.0f)
             {continue;}
-        edges1.push_back(pair<float,float>((*object1.coordinates)[i],(*object1.coordinates)[i+1]));
+        float worldX = (*object1.coordinates)[i] + object1.position.first;
+        float worldY = (*object1.coordinates)[i+1] + object1.position.second;
+        edges1.push_back(pair<float,float>(worldX, worldY));
     }
     for (size_t i = 0; i < object2.coordinates->size(); i += 2) {
         if ((*object2.coordinates)[i] == 0.0f && (*object2.coordinates)[i+1] == 0.0f)
-        {continue;}
-        edges1.push_back(pair<float,float>((*object2.coordinates)[i],(*object2.coordinates)[i+1]));
+            {continue;}
+        float worldX = (*object2.coordinates)[i] + object2.position.first;
+        float worldY = (*object2.coordinates)[i+1] + object2.position.second;
+        edges2.push_back(pair<float,float>(worldX, worldY));
     }
     return checkSATCollision(edges1, edges2);
+//    return true;
 }
 
 void normalize(pair<float,float>& norm)
@@ -137,7 +142,7 @@ int main(int argc, char *argv[])
     
     srand(static_cast<unsigned>(time(NULL)));
     
-    int numShapes = 20;
+    int numShapes = 50;
     vector<Polygon*> shapes;
     for (size_t i = 0; i < numShapes; ++i) {
         int gen = rand()%4 + 3;
@@ -190,15 +195,17 @@ int main(int argc, char *argv[])
         for (size_t i = 0; i < shapes.size(); ++i) {
             shapes[i]->update(elapsed);
             
-            for (size_t k = i+1; k < shapes.size(); ++k) {
-                while(checkCollision(*shapes[i], *shapes[k])) {
-                    pair<float,float> response(shapes[i]->position.first - shapes[k]->position.first, shapes[i]->position.second - shapes[k]->position.second);;
+            for (size_t k = i+1 % shapes.size(); k < shapes.size(); ++k) {
+                int maxChecks = 20;
+                while(checkCollision(*shapes[i], *shapes[k]) && maxChecks > 0) {
+                    pair<float,float> response(shapes[k]->position.first - shapes[i]->position.first, shapes[k]->position.second - shapes[i]->position.second);;
                     normalize(response);
                     
-                    shapes[i]->position.first -= response.first * 0.002;
-                    shapes[i]->position.second -= response.second * 0.002;
-                    shapes[k]->position.first += response.first * 0.002;
-                    shapes[k]->position.second += response.second * 0.002;
+                    shapes[i]->position.first -= response.first * 0.002f;
+                    shapes[i]->position.second -= response.second * 0.002f;
+                    shapes[k]->position.first += response.first * 0.002f;
+                    shapes[k]->position.second += response.second * 0.002f;
+                    --maxChecks;
                 }
             }
             shapes[i]->render(&program);
