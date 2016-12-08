@@ -16,6 +16,14 @@
 
 SDL_Window* displayWindow;
 
+pair<float,float> modelToWorldCoordinates(const Matrix& modelMatrix, const pair<float,float>& modelCoordinates)
+{
+    pair<float,float> worldCoordinates;
+    worldCoordinates.first = modelMatrix.m[0][0] * modelCoordinates.first + modelMatrix.m[0][1] * modelCoordinates.second + modelMatrix.m[2][0] * 1.0f + modelMatrix.m[3][0] * 1.0f;
+    worldCoordinates.second = modelMatrix.m[1][0] * modelCoordinates.first + modelMatrix.m[1][1] * modelCoordinates.second + modelMatrix.m[2][1] * 1.0f + modelMatrix.m[3][1] * 1.0f;
+    return worldCoordinates;
+}
+
 bool testSATSeparationForEdge(float edgeX, float edgeY, const std::vector<pair<float,float>>& points1, const std::vector<pair<float,float>>& points2) {
     float normalX = -edgeY;
     float normalY = edgeX;
@@ -90,21 +98,51 @@ bool checkSATCollision(const std::vector<pair<float,float>>& e1Points, const std
 
 bool checkCollision(Polygon& object1, Polygon& object2)
 {
+    float worldX;
+    float worldY;
     vector<pair<float,float>> edges1;
     vector<pair<float,float>> edges2;
     for (size_t i = 0; i < object1.coordinates->size(); i += 2) {
         if ((*object1.coordinates)[i] == 0.0f && (*object1.coordinates)[i+1] == 0.0f)
             {continue;}
-        float worldX = (*object1.coordinates)[i] + object1.position.first;
-        float worldY = (*object1.coordinates)[i+1] + object1.position.second;
-        edges1.push_back(pair<float,float>(worldX, worldY));
+        
+//        if ((*object1.coordinates)[i] > object1.position.first) {
+//             + object1.scale;
+//        } else if ((*object1.coordinates)[i] < object1.position.first) {
+//            worldX = (*object1.coordinates)[i] + object1.position.first - object1.scale;
+//        }
+//        if ((*object1.coordinates)[i+1] > object1.position.second) {
+//            worldY = (*object1.coordinates)[i+1] + object1.position.second + object1.scale;
+//        } else if ((*object1.coordinates)[i+1] < object1.position.second) {
+//            worldY = (*object1.coordinates)[i+1] + object1.position.second - object1.scale;
+//        }
+        worldX = (*object1.coordinates)[i] + object1.position.first;
+        worldY = (*object1.coordinates)[i+1] + object1.position.second;
+//        edges1.push_back(pair<float,float>(worldX, worldY));
+        
+        pair<float,float> coordinatePair((*object1.coordinates)[i], (*object1.coordinates)[i+1]);
+        edges1.push_back(modelToWorldCoordinates(object1.modelMatrix, coordinatePair));
     }
     for (size_t i = 0; i < object2.coordinates->size(); i += 2) {
         if ((*object2.coordinates)[i] == 0.0f && (*object2.coordinates)[i+1] == 0.0f)
             {continue;}
-        float worldX = (*object2.coordinates)[i] + object2.position.first;
-        float worldY = (*object2.coordinates)[i+1] + object2.position.second;
-        edges2.push_back(pair<float,float>(worldX, worldY));
+//        if ((*object2.coordinates)[i] > object2.position.first) {
+//            worldX = (*object2.coordinates)[i] + object2.position.first + object2.scale;
+//        } else if ((*object2.coordinates)[i] < object2.position.first) {
+//            worldX = (*object2.coordinates)[i] + object2.position.first - object2.scale;
+//        }
+//        if ((*object2.coordinates)[i+1] > object2.position.second) {
+//            worldY = (*object2.coordinates)[i+1] + object2.position.second + object2.scale;
+//        } else if ((*object2.coordinates)[i+1] < object2.position.second) {
+//            worldY = (*object2.coordinates)[i+1] + object2.position.second - object2.scale;
+//        }
+        worldX = (*object2.coordinates)[i] + object2.position.first;
+        worldY = (*object2.coordinates)[i+1] + object2.position.second;
+//        edges2.push_back(pair<float,float>(worldX, worldY));
+        
+        pair<float,float> coordinatePair((*object2.coordinates)[i], (*object2.coordinates)[i+1]);
+        pair<float,float> pair2 = modelToWorldCoordinates(object2.modelMatrix, coordinatePair);
+        edges2.push_back(pair2);
     }
     return checkSATCollision(edges1, edges2);
 //    return true;
@@ -142,7 +180,7 @@ int main(int argc, char *argv[])
     
     srand(static_cast<unsigned>(time(NULL)));
     
-    int numShapes = 50;
+    int numShapes = 10;
     vector<Polygon*> shapes;
     for (size_t i = 0; i < numShapes; ++i) {
         int gen = rand()%4 + 3;
@@ -196,7 +234,7 @@ int main(int argc, char *argv[])
             shapes[i]->update(elapsed);
             
             for (size_t k = i+1 % shapes.size(); k < shapes.size(); ++k) {
-                int maxChecks = 20;
+                int maxChecks = 100;
                 while(checkCollision(*shapes[i], *shapes[k]) && maxChecks > 0) {
                     pair<float,float> response(shapes[k]->position.first - shapes[i]->position.first, shapes[k]->position.second - shapes[i]->position.second);;
                     normalize(response);
