@@ -70,7 +70,7 @@ void Polygon::render(ShaderProgram* program)
 
 
 // Triangles
-Triangle::Triangle(float x, float y): Polygon(x, y, 6)
+Triangle::Triangle(float x, float y): Polygon(x, y, 3)
 {
     coordinates->insert(coordinates->end(), {
         // Triangle 1
@@ -88,7 +88,7 @@ Triangle::Triangle(float x, float y): Polygon(x, y, 6)
 }
 
 // Squares
-Square::Square(float x, float y): Polygon(x, y, 12)
+Square::Square(float x, float y): Polygon(x, y, 6)
 {
     coordinates->insert(coordinates->end(), {
         // Triangle 1
@@ -115,7 +115,7 @@ Square::Square(float x, float y): Polygon(x, y, 12)
 
 
 // Pentagons
-Pentagon::Pentagon(float x, float y): Polygon(x, y, 30)
+Pentagon::Pentagon(float x, float y): Polygon(x, y, 15)
 {
     coordinates->insert(coordinates->end(), {
         // Triangle 1
@@ -166,7 +166,7 @@ Pentagon::Pentagon(float x, float y): Polygon(x, y, 30)
 
 
 // Hexagons
-Hexagon::Hexagon(float x, float y): Polygon(x, y, 36)
+Hexagon::Hexagon(float x, float y): Polygon(x, y, 18)
 {
     coordinates->insert(coordinates->end(), {
         // Triangle 1

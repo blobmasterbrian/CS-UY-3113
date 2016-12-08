@@ -103,8 +103,8 @@ bool checkCollision(Polygon& object1, Polygon& object2)
     vector<pair<float,float>> edges1;
     vector<pair<float,float>> edges2;
     for (size_t i = 0; i < object1.coordinates->size(); i += 2) {
-        if ((*object1.coordinates)[i] == 0.0f && (*object1.coordinates)[i+1] == 0.0f)
-            {continue;}
+//        if ((*object1.coordinates)[i] == 0.0f && (*object1.coordinates)[i+1] == 0.0f)
+//            {continue;}
         
 //        if ((*object1.coordinates)[i] > object1.position.first) {
 //             + object1.scale;
@@ -124,8 +124,9 @@ bool checkCollision(Polygon& object1, Polygon& object2)
         edges1.push_back(modelToWorldCoordinates(object1.modelMatrix, coordinatePair));
     }
     for (size_t i = 0; i < object2.coordinates->size(); i += 2) {
-        if ((*object2.coordinates)[i] == 0.0f && (*object2.coordinates)[i+1] == 0.0f)
-            {continue;}
+//        if ((*object2.coordinates)[i] == 0.0f && (*object2.coordinates)[i+1] == 0.0f)
+//            {continue;}
+        
 //        if ((*object2.coordinates)[i] > object2.position.first) {
 //            worldX = (*object2.coordinates)[i] + object2.position.first + object2.scale;
 //        } else if ((*object2.coordinates)[i] < object2.position.first) {
@@ -180,7 +181,7 @@ int main(int argc, char *argv[])
     
     srand(static_cast<unsigned>(time(NULL)));
     
-    int numShapes = 10;
+    int numShapes = 20;
     vector<Polygon*> shapes;
     for (size_t i = 0; i < numShapes; ++i) {
         int gen = rand()%4 + 3;
@@ -239,10 +240,10 @@ int main(int argc, char *argv[])
                     pair<float,float> response(shapes[k]->position.first - shapes[i]->position.first, shapes[k]->position.second - shapes[i]->position.second);;
                     normalize(response);
                     
-                    shapes[i]->position.first -= response.first * 0.002f;
-                    shapes[i]->position.second -= response.second * 0.002f;
-                    shapes[k]->position.first += response.first * 0.002f;
-                    shapes[k]->position.second += response.second * 0.002f;
+                    shapes[i]->position.first -= response.first * 0.001f;
+                    shapes[i]->position.second -= response.second * 0.001f;
+                    shapes[k]->position.first += response.first * 0.001f;
+                    shapes[k]->position.second += response.second * 0.001f;
                     --maxChecks;
                 }
             }
