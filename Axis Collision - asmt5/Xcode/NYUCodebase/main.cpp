@@ -19,8 +19,8 @@ SDL_Window* displayWindow;
 pair<float,float> modelToWorldCoordinates(const Matrix& modelMatrix, const pair<float,float>& modelCoordinates)
 {
     pair<float,float> worldCoordinates;
-    worldCoordinates.first = modelMatrix.m[0][0] * modelCoordinates.first + modelMatrix.m[0][1] * modelCoordinates.second + modelMatrix.m[2][0] * 1.0f + modelMatrix.m[3][0] * 1.0f;
-    worldCoordinates.second = modelMatrix.m[1][0] * modelCoordinates.first + modelMatrix.m[1][1] * modelCoordinates.second + modelMatrix.m[2][1] * 1.0f + modelMatrix.m[3][1] * 1.0f;
+    worldCoordinates.first = modelMatrix.m[0][0] * modelCoordinates.first + modelMatrix.m[1][0] * modelCoordinates.second + modelMatrix.m[2][0] * 0.0f + modelMatrix.m[3][0] * 1.0f;
+    worldCoordinates.second = modelMatrix.m[0][1] * modelCoordinates.first + modelMatrix.m[1][1] * modelCoordinates.second + modelMatrix.m[2][1] * 0.0f + modelMatrix.m[3][1] * 1.0f;
     return worldCoordinates;
 }
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     
     srand(static_cast<unsigned>(time(NULL)));
     
-    int numShapes = 20;
+    int numShapes = 33;
     vector<Polygon*> shapes;
     for (size_t i = 0; i < numShapes; ++i) {
         int gen = rand()%4 + 3;
@@ -235,15 +235,15 @@ int main(int argc, char *argv[])
             shapes[i]->update(elapsed);
             
             for (size_t k = i+1 % shapes.size(); k < shapes.size(); ++k) {
-                int maxChecks = 100;
+                int maxChecks = 15;
                 while(checkCollision(*shapes[i], *shapes[k]) && maxChecks > 0) {
                     pair<float,float> response(shapes[k]->position.first - shapes[i]->position.first, shapes[k]->position.second - shapes[i]->position.second);;
                     normalize(response);
                     
-                    shapes[i]->position.first -= response.first * 0.001f;
-                    shapes[i]->position.second -= response.second * 0.001f;
-                    shapes[k]->position.first += response.first * 0.001f;
-                    shapes[k]->position.second += response.second * 0.001f;
+                    shapes[i]->position.first -= response.first * 0.004f;
+                    shapes[i]->position.second -= response.second * 0.004f;
+                    shapes[k]->position.first += response.first * 0.004f;
+                    shapes[k]->position.second += response.second * 0.004f;
                     --maxChecks;
                 }
             }
