@@ -20,6 +20,7 @@
 #define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
 #endif
 
+#define FPS 30.0f
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
 
@@ -46,62 +47,92 @@ GLuint LoadTexture(const char* image_path)
     return textureID;
 }
 
+void drawBackground(ShaderProgram* program, GLuint texture, Matrix matrix)
+{
+    program->setModelMatrix(matrix);
+    float vertices[] = {
+        -46.0f, 27.5f,  // Triangle 1 Coord A
+        -46.0f, -27.5f, // Triangle 1 Coord B
+        46.0f, -27.5f,   // Triangle 1 Coord C
+        -46.0f, 27.5f,   // Triangle 2 Coord A
+        46.0f, -27.5f, // Triangle 2 Coord B
+        46.0f, 27.5f   // Triangle 2 Coord C
+    };
+    
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+    glEnableVertexAttribArray(program->positionAttribute);
+    
+    glBindTexture(GL_TEXTURE_2D, texture);
+    float texCoords[] = {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    };
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+    glEnableVertexAttribArray(program->texCoordAttribute);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
+}
+
 float lerp(float v0, float v1, float t) {
     return (1.0-t)*v0 + t*v1;
 }
-
-//void worldToTileCoordinates(float worldX, float worldY, int* gridX, int* gridY)
-//{
-//    *gridX = static_cast<int>(worldX / TILE_SIZEY);
-//    *gridY = static_cast<int>(worldY / TILE_SIZEY);
-//}
 
 GameState state = GameState::Level;
 
 void mainMenu()
 {
-//    SDL_Init(SDL_INIT_VIDEO);
-//    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
-//    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
-//    SDL_GL_MakeCurrent(displayWindow, context);
-//#ifdef _WINDOWS
-//    glewInit();
-//#endif
-//    
-//    SDL_Event event;
-//    bool done = false;
-//    glViewport(0, 0, 1280, 720);
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    
-//    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-//    
-//    Matrix projectionMatrix;
-//    Matrix viewMatrix;
-//    
-//    projectionMatrix.setOrthoProjection(-14.0f, 14.0f, -8.0f, 8.0f, -1.0f, 1.0f);
-//    glUseProgram(program.programID);
-//    
-//    while (!done) {
-//        while (SDL_PollEvent(&event)) {
-//            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-//                done = true;
-//            }
-//            if (event.type == SDL_KEYDOWN) {
-//                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-//                    state = GameState::Level;
-//                    done = true;
-//                }
-//            }
-//        glClear(GL_COLOR_BUFFER_BIT);
-//        program.setProjectionMatrix(projectionMatrix);
-//        program.setViewMatrix(viewMatrix);
-//        glDisableVertexAttribArray(program.positionAttribute);
-//        glDisableVertexAttribArray(program.texCoordAttribute);
-//        SDL_GL_SwapWindow(displayWindow);
-//        }
-//    }
-//    SDL_Quit();
+    SDL_Init(SDL_INIT_VIDEO);
+    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+    SDL_GL_MakeCurrent(displayWindow, context);
+#ifdef _WINDOWS
+    glewInit();
+#endif
+    
+    SDL_Event event;
+    bool done = false;
+    glViewport(0, 0, 1280, 720);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    
+    Matrix projectionMatrix;
+    Matrix viewMatrix;
+    Matrix backgroundMatrix;
+    GLuint background = LoadTexture("/Images/skybackground.png");
+    
+    projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+                done = true;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    state = GameState::Level;
+                    done = true;
+                }
+            }
+        }
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        drawBackground(&program, background, backgroundMatrix);
+        
+        program.setProjectionMatrix(projectionMatrix);
+        program.setViewMatrix(viewMatrix);
+        glDisableVertexAttribArray(program.positionAttribute);
+        glDisableVertexAttribArray(program.texCoordAttribute);
+        SDL_GL_SwapWindow(displayWindow);
+    }
+    SDL_Quit();
 }
 
 void levelState()
@@ -126,6 +157,7 @@ void levelState()
     
     Matrix projectionMatrix;
     Matrix viewMatrix;
+    Matrix backgroundMatrix;
     const Uint8 *keys = SDL_GetKeyboardState(NULL);
     
     projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
@@ -134,6 +166,7 @@ void levelState()
     program.setProjectionMatrix(projectionMatrix);
     program.setViewMatrix(viewMatrix);
     
+    GLuint background = LoadTexture("/Images/skybackground.png");
     GLuint maptex = LoadTexture("/Images/platformertiles.png");
     Level level;
     level.program = &program;
@@ -141,8 +174,8 @@ void levelState()
     level.xsprites = 8;
     level.ysprites = 3;
     level.createMap();
-    level.player->height = 1.5;
-    level.player->width = 1.5;
+//    level.player->height = 1.5;
+//    level.player->width = 1.5;
 //    program.setViewMatrix(level.player->playerView);
     
     while (!done) {
@@ -156,23 +189,29 @@ void levelState()
                 done = true;
             }
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
-                    level.player->velocity.second = 2.0f;
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP && level.player->jump) {
+                    level.player->velocity.second = 15.0f;
+                    level.player->jump = false;
+                    level.player->index = 13;
+                    level.player->setSpriteCoords(level.player->index);
                 }
             }
         }
         
         if (keys[SDL_SCANCODE_LEFT]) {
+            level.player->acceleration.first -= 10.0f;
         }
         if (keys[SDL_SCANCODE_RIGHT]) {
+            level.player->acceleration.first += 10.0f;
         }
         
         glClear(GL_COLOR_BUFFER_BIT);
         
+        drawBackground(&program, background, backgroundMatrix);
         level.drawMap();
 //        GLuint waste = LoadTexture("/Images/characters_3.png");
 //        level.player->textureID = waste;
-        
+
         for (size_t i = 0; i < level.entities.size(); ++i) {
             float fixedElapsed = elapsed;
             if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
@@ -183,12 +222,54 @@ void levelState()
                 level.entities[i]->update(FIXED_TIMESTEP);
             }
             level.entities[i]->update(fixedElapsed);
+            
+            
+            level.entities[i]->animation += elapsed;
+            if (level.entities[i]->kind == EntityType::Player) {
+                if (level.entities[i]->animation > 5.0f/FPS && level.entities[i]->velocity.first > 0.5f && level.entities[i]->jump) {
+                    level.entities[i]->index = ++level.entities[i]->index%8 + 8;
+                    level.entities[i]->setSpriteCoords(level.entities[i]->index);
+                    level.entities[i]->animation = 0.0f;
+                }
+            
+                if (level.entities[i]->animation > 5.0f/FPS && level.entities[i]->velocity.first < -0.5f && level.entities[i]->jump) {
+                    level.entities[i]->index = --level.entities[i]->index%8 + 8;
+                    level.entities[i]->setSpriteCoords(level.entities[i]->index);
+                    level.entities[i]->animation = 0.0f;
+                }
+            } else {
+                
+                if (level.entities[i]->jump) {
+                    level.entities[i]->attack();
+                }
+                
+                if (level.entities[i]->animation > 5.0f/FPS && level.entities[i]->velocity.first > 0.5f && level.entities[i]->jump) {
+                    level.entities[i]->index = ++level.entities[i]->index%3 + int(level.entities[i]->kind) + 24;
+                    level.entities[i]->setSpriteCoords(level.entities[i]->index);
+                    level.entities[i]->animation = 0.0f;
+                }
+                
+                if (level.entities[i]->animation > 5.0f/FPS && level.entities[i]->velocity.first < -0.5f && level.entities[i]->jump) {
+                    level.entities[i]->index = --level.entities[i]->index%3 + int(level.entities[i]->kind) + 12;
+                    level.entities[i]->setSpriteCoords(level.entities[i]->index);
+                    level.entities[i]->animation = 0.0f;
+                }
+            }
+            
+            if (level.entities[i]->kind == EntityType::Bat && fabs(level.entities[i]->velocity.second) > 0.0f) {
+                level.entities[i]->index = 51;
+                level.entities[i]->setSpriteCoords(level.entities[i]->index);
+            }
+            
             level.entities[i]->render(&program);
         }
+        
+        backgroundMatrix.identity();
+        backgroundMatrix.Translate(level.player->position.first, level.player->position.second + 11.0f, 0.0f);
 
         program.setViewMatrix(level.player->playerView);
         level.player->playerView.identity();
-        level.player->playerView.Translate(-level.player->position.first, -level.player->position.second, 0.0f);
+        level.player->playerView.Translate(-level.player->position.first, -level.player->position.second - 11.0f, 0.0f);
         
         glDisableVertexAttribArray(program.positionAttribute);
         glDisableVertexAttribArray(program.texCoordAttribute);

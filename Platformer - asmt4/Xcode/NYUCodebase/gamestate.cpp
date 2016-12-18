@@ -183,18 +183,25 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
     if (type == "Player") {
         player = &Player::getInstance(type, xCoordinate, yCoordinate); //new Player(type, xCoordinate, yCoordinate);
         entity = player;
-    } else if (type == "Enemy") {
-        entity = new Enemy(type, xCoordinate, yCoordinate);
+        entity->scale = 1.5f;
     } else {
-        entity = new Object(type, xCoordinate, yCoordinate);
+        entity = new Enemy(type, xCoordinate, yCoordinate);
+        entity->scale = 0.75f;
+        entity->velocity.first = 1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.5f - (1.0f))));
+        if (rand()%2 == 0) {
+            entity->velocity.first = -entity->velocity.first;
+        }
     }
+    entity->height = entity->scale*2;
+    entity->width = entity->scale*2;
+    entity->level = this;
     entities.push_back(entity);
 }
 
 void worldToTileCoordinates(float worldX, float worldY, int* gridX, int* gridY)
 {
     *gridX = static_cast<int>(worldX / TILE_SIZEX);
-    *gridY = static_cast<int>(worldY / TILE_SIZEY);
+    *gridY = static_cast<int>(-worldY / TILE_SIZEY);
 }
 
 

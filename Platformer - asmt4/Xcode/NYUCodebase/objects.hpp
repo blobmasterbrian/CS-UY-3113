@@ -11,13 +11,15 @@
 
 #include <stdio.h>
 #include "ShaderProgram.h"
+#include "gamestate.hpp"
 
 extern float TILE_SIZEX;
 extern float TILE_SIZEY;
 
 using namespace std;
 
-enum class EntityType {Player, Skeleton, Bat, Spider, Blob};
+enum class EntityType {Player = 8, Skeleton = 9, Bat = 51, Spider = 57, Blob = 48};
+struct Level;
 
 GLuint LoadTexture(const char* image_path);
 float lerp(float v0, float v1, float t);
@@ -27,6 +29,7 @@ struct Entity
 {
     EntityType kind;
     Matrix modelMatrix;
+    Level* level;
     
     GLuint textureID;
     int index;
@@ -35,12 +38,16 @@ struct Entity
     float spriteX;
     float spriteY;
     
+    float animation;
+    
     float u;
     float v;
     float height;
     float width;
     float scale;
     bool gravity;
+    bool jump;
+    bool friction;
     
     pair<float,float> position;
     pair<int,int> gridPosition;
@@ -52,14 +59,17 @@ struct Entity
     void setSpriteCoords(int index);
     void update(float elapsed);
     void render(ShaderProgram* program);
-    void resolveCollision();
+    bool resolveCollision();
     bool collision(Entity* entity);
+    
+    virtual void attack() = 0;
 };
 
 struct Player : Entity
 {
     Matrix playerView;
     static Player& getInstance(string& type, float xCoordinate, float yCoordinate);
+    void attack();
     
 protected:
     Player(string& type, float xCoordinate, float yCoordinate);
@@ -70,11 +80,15 @@ protected:
 struct Enemy : Entity
 {
     Enemy(string& type, float xCoordinate, float yCoordinate);
+    void attack();
+    float initHeight;
+    float initSpeed;
 };
 
 struct Object : Entity
 {
     Object(string& type, float xCoordinate, float yCoordinate);
+    void attack();
 };
 
 #endif /* objects_hpp */

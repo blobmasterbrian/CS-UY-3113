@@ -20,7 +20,11 @@
 extern float TILE_SIZEX;
 extern float TILE_SIZEY;
 
+using namespace std;
+
 enum class GameState {MainMenu, Level, Win, GameOver};
+struct Entity;
+struct Player;
 
 struct Level {
     Level();
