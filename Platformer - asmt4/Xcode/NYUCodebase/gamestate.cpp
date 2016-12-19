@@ -11,9 +11,9 @@ using namespace std;
 
 Level::Level() {vertexData = new vector<float>; textureData = new vector<float>;}
 
-void Level::createMap()
+void Level::createMap(string& input)
 {
-    ifstream gamedata("NYUCodebase.app/Contents/Resources/Images/gamedata.txt");
+    ifstream gamedata(input);
     string line;
     while (getline(gamedata, line)) {
         if (line == "[header]") {
@@ -187,10 +187,6 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
     } else {
         entity = new Enemy(type, xCoordinate, yCoordinate);
         entity->scale = 0.75f;
-        entity->velocity.first = 1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.5f - (1.0f))));
-        if (rand()%2 == 0) {
-            entity->velocity.first = -entity->velocity.first;
-        }
     }
     entity->height = entity->scale*2;
     entity->width = entity->scale*2;

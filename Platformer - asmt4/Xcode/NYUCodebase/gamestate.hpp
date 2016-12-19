@@ -22,7 +22,7 @@ extern float TILE_SIZEY;
 
 using namespace std;
 
-enum class GameState {MainMenu, Level, Win, GameOver};
+enum class GameState {MainMenu, Level, Level2, Level3, Secret, Win, GameOver, Quit};
 struct Entity;
 struct Player;
 
@@ -44,7 +44,7 @@ struct Level {
     Matrix levelMatrix;
     ShaderProgram* program;
     
-    void createMap();
+    void createMap(string& input);
     bool readHeader(ifstream& input);
     bool readLayerData(ifstream& input);
     bool readEntityData(ifstream& input);

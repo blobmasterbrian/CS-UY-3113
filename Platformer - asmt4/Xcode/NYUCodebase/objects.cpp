@@ -40,7 +40,9 @@ void Entity::update(float elapsed)
 
     acceleration.first = lerp(acceleration.first, 0.0f, elapsed * 10.0f);
     if (gravity && !jump) {
-        velocity.second = lerp(velocity.second, -10.0f, elapsed);
+        if (kind != EntityType::Blob) {
+            velocity.second = lerp(velocity.second, -10.0f, elapsed);
+        }
         acceleration.second = lerp(acceleration.second, -50.0f, elapsed);
     }
     
@@ -281,6 +283,14 @@ bool Entity::resolveCollision()
     return false;
 }
 
+bool Entity::collision(Entity* entity)
+{
+    if (position.first + width/2*0.5f < entity->position.first - entity->width/2*0.5f || position.first - width/2*0.5f > entity->position.first + entity->width/2*0.5f || position.second + width/2*0.5f < entity->position.second - entity->width/2*0.5f || position.second - width/2*0.5f > entity->position.second + entity->width/2*0.5f) {
+        return false;
+    }
+    return true;
+}
+
 void Entity::setSpriteCoords(int index)
 {
     u = (float)(((int)index) % horizontalNum) / (float) horizontalNum;
@@ -292,6 +302,9 @@ void Entity::setSpriteCoords(int index)
 Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
 {
     static Player instance(type, xCoordinate, yCoordinate);
+    instance.position.first = xCoordinate;
+    instance.position.second = yCoordinate;
+    instance.textureID = LoadTexture("/Images/characters_3.png");
     return instance;
 }
 
@@ -331,6 +344,12 @@ Enemy::Enemy(string& type, float xCoordinate, float yCoordinate): Entity(type, x
         setSpriteCoords(index);
         gravity = true;
     }
+    
+    velocity.first = 1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(2.5f - (1.0f))));
+    if (rand()%2 == 0) {
+        velocity.first = -velocity.first;
+    }
+    
     friction = false;
     initHeight = position.second;
     initSpeed = velocity.first;
@@ -381,7 +400,38 @@ void Enemy::attack()
             gravity = true;
         }
     } else if (kind == EntityType::Blob) {
-        
+        if (attack % 199 == 0) {
+            index = 49;
+            setSpriteCoords(index);
+            velocity.first = 0.0f;
+        } else if (velocity.first == 0.0f && attack % 29 == 0) {
+            acceleration.second = 20.0f;
+            acceleration.first = 20.0f;
+            velocity.first = 2.5f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (2.5f))));
+            velocity.second = 3.5f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (3.5f))));
+            if (rand()%2 == 0) {
+                velocity.first = -velocity.first;
+                if (velocity.first < 0.0f) {
+                    index = 62;
+                } else {
+                    index = 74;
+                }
+                setSpriteCoords(index);
+            } else {
+                if (velocity.first < 0.0f) {
+                    index = 62;
+                } else {
+                    index = 74;
+                }
+                setSpriteCoords(index);
+            }
+        } else if (fabs(velocity.first) > fabs(initSpeed)) {
+            if (velocity.first > 0.0f) {
+                velocity.first = fabs(initSpeed);
+            } else {
+                velocity.first = -fabs(initSpeed);
+            }
+        }
     }
 }
 
