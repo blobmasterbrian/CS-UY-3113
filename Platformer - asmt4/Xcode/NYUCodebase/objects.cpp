@@ -51,7 +51,7 @@ void Entity::update(float elapsed)
 //        acceleration.second = 0.0f;
 //    }
     
-    modelMatrix.Translate(position.first, position.second, 0);
+    modelMatrix.Translate(position.first, position.second, 0.0f);
 }
 
 void Entity::render(ShaderProgram* program)

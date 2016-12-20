@@ -48,6 +48,24 @@ GLuint LoadTexture(const char* image_path)
     return textureID;
 }
 
+GLuint LoadFontTexture(const char* image_path)
+{
+    SDL_Surface* surface = IMG_Load(image_path);
+    
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, surface->pixels);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    SDL_FreeSurface(surface);
+    
+    return textureID;
+}
+
 void drawBackground(ShaderProgram* program, GLuint texture, Matrix matrix)
 {
     program->setModelMatrix(matrix);
@@ -75,6 +93,41 @@ void drawBackground(ShaderProgram* program, GLuint texture, Matrix matrix)
     glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
     glEnableVertexAttribArray(program->texCoordAttribute);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
+}
+
+void drawText(ShaderProgram *program, int fontTexture, std::string text, float size, float spacing, float shiftX, float shiftY) {
+    float texture_size = 1.0/16.0f;
+    std::vector<float> vertexData;
+    std::vector<float> texCoordData;
+    for(int i = 0; i < text.size(); i++) {
+        float texture_x = (float)(((int)text[i]) % 16) / 16.0f;
+        float texture_y = (float)(((int)text[i]) / 16) / 16.0f;
+        vertexData.insert(vertexData.end(), {
+            ((size+spacing) * i) + (-0.5f * size) + shiftX, 0.5f * size + shiftY,
+            ((size+spacing) * i) + (-0.5f * size) + shiftX, -0.5f * size + shiftY,
+            ((size+spacing) * i) + (0.5f * size) + shiftX, 0.5f * size + shiftY,
+            ((size+spacing) * i) + (0.5f * size) + shiftX, -0.5f * size + shiftY,
+            ((size+spacing) * i) + (0.5f * size) + shiftX, 0.5f * size + shiftY,
+            ((size+spacing) * i) + (-0.5f * size) + shiftX, -0.5f * size + shiftY,
+        });
+        texCoordData.insert(texCoordData.end(), {
+            texture_x, texture_y,
+            texture_x, texture_y + texture_size,
+            texture_x + texture_size, texture_y,
+            texture_x + texture_size, texture_y + texture_size,
+            texture_x + texture_size, texture_y,
+            texture_x, texture_y + texture_size,
+        }); }
+    
+//    glUseProgram(program->programID);
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData.data());
+    glEnableVertexAttribArray(program->positionAttribute);
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoordData.data());
+    glEnableVertexAttribArray(program->texCoordAttribute);
+    glBindTexture(GL_TEXTURE_2D, fontTexture);
+    glDrawArrays(GL_TRIANGLES, 0, text.size() * 6);
     glDisableVertexAttribArray(program->positionAttribute);
     glDisableVertexAttribArray(program->texCoordAttribute);
 }
@@ -107,6 +160,8 @@ void mainMenu()
     Matrix viewMatrix;
     Matrix backgroundMatrix;
     GLuint background = LoadTexture("/Images/screen1.png");
+    GLuint font = LoadFontTexture("/Images/font1.png");
+    GLuint font2 = LoadFontTexture("/Images/font2.png");
     int konamiCode = 0;
     
     projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
@@ -151,6 +206,8 @@ void mainMenu()
         glClear(GL_COLOR_BUFFER_BIT);
         
         drawBackground(&program, background, backgroundMatrix);
+        drawText(&program, font2, "Regicide", 5.0f, -1.0f, -13.0f, 18.0f);
+        drawText(&program, font, "Press Space to Start", 3.5f, -1.0f, -23.0f, -22.0f);
         
         program.setProjectionMatrix(projectionMatrix);
         program.setViewMatrix(viewMatrix);
@@ -475,7 +532,8 @@ void gameOver()
     Matrix projectionMatrix;
     Matrix viewMatrix;
     Matrix backgroundMatrix;
-    GLuint background = LoadTexture("/Images/screen2.png");
+    GLuint background = LoadFontTexture("/Images/screen2.png");
+    GLuint font = LoadFontTexture("/Images/font1.png");
     
     projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
     glUseProgram(program.programID);
@@ -499,6 +557,8 @@ void gameOver()
         glClear(GL_COLOR_BUFFER_BIT);
         
         drawBackground(&program, background, backgroundMatrix);
+        drawBackground(&program, background, backgroundMatrix);
+        drawText(&program, font, "Restart?", 3.5f, -1.0f, -8.0f, -22.0f);
         
         program.setProjectionMatrix(projectionMatrix);
         program.setViewMatrix(viewMatrix);
