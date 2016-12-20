@@ -366,11 +366,11 @@ void levelState(int lev)
                 done = true;
 //                goto end;
             }
-            if (level.entities[i]->kind != EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-2)) {
+            if (level.entities[i]->kind != EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-1)) {
                 delete level.entities[i];
                 level.entities[i] = nullptr;
                 continue;
-            } else if (level.entities[i]->kind == EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-2)) {
+            } else if (level.entities[i]->kind == EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-1)) {
                 state = GameState::GameOver;
                 done = true;
             }

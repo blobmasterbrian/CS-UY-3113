@@ -181,7 +181,7 @@ void Level::placeEntity(string& type, float xCoordinate, float yCoordinate)
 {
     Entity* entity;
     if (type == "Player") {
-        player = &Player::getInstance(type, xCoordinate, yCoordinate); //new Player(type, xCoordinate, yCoordinate);
+        player = &Player::getInstance(type, xCoordinate + 1.0f, yCoordinate - 1.25f); //new Player(type, xCoordinate, yCoordinate);
         entity = player;
         entity->scale = 1.5f;
     } else {

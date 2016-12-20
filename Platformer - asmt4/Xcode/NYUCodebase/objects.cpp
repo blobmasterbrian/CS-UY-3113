@@ -302,7 +302,7 @@ void Entity::setSpriteCoords(int index)
 Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
 {
     static Player instance(type, xCoordinate, yCoordinate);
-    instance.position.first = xCoordinate;
+    instance.position.first = xCoordinate + 1.0f;
     instance.position.second = yCoordinate;
     instance.velocity.first = 0.0f;
     instance.velocity.second = 0.0f;
