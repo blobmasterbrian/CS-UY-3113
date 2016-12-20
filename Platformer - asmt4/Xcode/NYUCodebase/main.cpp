@@ -260,7 +260,7 @@ void levelState(int lev)
     level.program = &program;
     level.levelTexture = maptex;
     level.xsprites = 8;
-    level.ysprites = 3;
+    level.ysprites = 5;
     
     string levelLoad[4] = {"NYUCodebase.app/Contents/Resources/Images/gamedata.txt", "NYUCodebase.app/Contents/Resources/Images/gamedata1.txt", "NYUCodebase.app/Contents/Resources/Images/gamedata2.txt", "NYUCodebase.app/Contents/Resources/Images/gamedatasecret.txt"};
 
