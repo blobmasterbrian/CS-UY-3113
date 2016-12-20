@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A3B03E31E08AA0800F5B080 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = 1A3B03E21E08AA0800F5B080 /* Sounds */; };
+		1A3B03E71E08AE4400F5B080 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A3B03E61E08AE4400F5B080 /* SDL2_mixer.framework */; };
 		1A6948B91DD8D62500263DE1 /* objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A6948B71DD8D62500263DE1 /* objects.cpp */; };
 		1A6948BC1DD8D65400263DE1 /* gamestate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A6948BA1DD8D65400263DE1 /* gamestate.cpp */; };
 		1AAA499F1D96F8FD00062961 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 1AAA499E1D96F8FD00062961 /* Images */; };
@@ -27,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A3B03E21E08AA0800F5B080 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
+		1A3B03E61E08AE4400F5B080 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		1A6948B71DD8D62500263DE1 /* objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = objects.cpp; sourceTree = "<group>"; };
 		1A6948B81DD8D62500263DE1 /* objects.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = objects.hpp; sourceTree = "<group>"; };
 		1A6948BA1DD8D65400263DE1 /* gamestate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gamestate.cpp; sourceTree = "<group>"; };
@@ -63,6 +67,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D5AC2D019AE6280004CB1BF /* OpenGL.framework in Frameworks */,
+				1A3B03E71E08AE4400F5B080 /* SDL2_mixer.framework in Frameworks */,
 				6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */,
 				6D5A86E319AE5CD10066C1FD /* SDL2.framework in Frameworks */,
 				6D5AC2D219AE6A1E004CB1BF /* SDL2_image.framework in Frameworks */,
@@ -93,6 +98,7 @@
 		6D5A86AC19AE5C710066C1FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1A3B03E61E08AE4400F5B080 /* SDL2_mixer.framework */,
 				6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */,
 				6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */,
 				6D5A86E219AE5CD10066C1FD /* SDL2.framework */,
@@ -115,6 +121,7 @@
 		6D5A86B319AE5C710066C1FD /* NYUCodebase */ = {
 			isa = PBXGroup;
 			children = (
+				1A3B03E21E08AA0800F5B080 /* Sounds */,
 				1AAA499E1D96F8FD00062961 /* Images */,
 				6D5A86E119AE5CAA0066C1FD /* Code */,
 				6D5A86B419AE5C710066C1FD /* Supporting Files */,
@@ -227,6 +234,7 @@
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				6DEF23C11B96CC2600BCE792 /* fragment.glsl in Resources */,
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
+				1A3B03E31E08AA0800F5B080 /* Sounds in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				1AAA499F1D96F8FD00062961 /* Images in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,

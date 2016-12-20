@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include </Library/Frameworks/SDL2_mixer.framework/Headers/SDL_mixer.h>
 #include "ShaderProgram.h"
 #include "Matrix.h"
 #include <random>
@@ -206,11 +207,18 @@ void levelState(int lev)
     
     string levelLoad[4] = {"NYUCodebase.app/Contents/Resources/Images/gamedata.txt", "NYUCodebase.app/Contents/Resources/Images/gamedata1.txt", "NYUCodebase.app/Contents/Resources/Images/gamedata2.txt", "NYUCodebase.app/Contents/Resources/Images/gamedatasecret.txt"};
 
-createLevel:
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+    Mix_Chunk* jump = Mix_LoadWAV("/Sounds/jump.wav");
+    Mix_Music* theme = Mix_LoadMUS("/Sounds/theme.mp3");
+    Mix_Music* secret = Mix_LoadMUS("/Sounds/secrettheme.mp3");
+    
+//createLevel:
     level.createMap(levelLoad[lev]);
 //    level.player->height = 1.5;
 //    level.player->width = 1.5;
 //    program.setViewMatrix(level.player->playerView);
+    bool changed = false;
+    Mix_PlayMusic(theme, -1);
     
     while (!done) {
         
@@ -225,12 +233,17 @@ createLevel:
             if (event.type == SDL_KEYDOWN) {
                 if (state == GameState::Secret) {
                     background = LoadTexture("/Images/secretbackground.png");
+                    if (!changed) {
+                        Mix_PlayMusic(secret, -1);
+                        changed = true;
+                    }
                 }
                 if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
                     state = GameState::Quit;
                     done = true;
                 }
                 if (event.key.keysym.scancode == SDL_SCANCODE_UP && level.player->jump) {
+                    Mix_PlayChannel(-1, jump, 0);
                     level.player->velocity.second = 15.0f;
                     level.player->jump = false;
                     level.player->index = 13;
@@ -257,6 +270,9 @@ createLevel:
 //        level.player->textureID = waste;
 
         for (size_t i = 0; i < level.entities.size(); ++i) {
+            if (level.entities[i] == nullptr) {
+                continue;
+            }
             float fixedElapsed = elapsed;
             if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
                 fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
@@ -292,6 +308,14 @@ createLevel:
                 state = GameState::GameOver;
                 done = true;
 //                goto end;
+            }
+            if (level.entities[i]->kind != EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-2)) {
+                delete level.entities[i];
+                level.entities[i] = nullptr;
+                continue;
+            } else if (level.entities[i]->kind == EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-2)) {
+                state = GameState::GameOver;
+                done = true;
             }
             
             
@@ -370,6 +394,8 @@ createLevel:
         glDisableVertexAttribArray(program.texCoordAttribute);
         SDL_GL_SwapWindow(displayWindow);
     }
+    Mix_CloseAudio();
+    Mix_FreeChunk(jump);
     SDL_Quit();
 }
 
@@ -394,7 +420,7 @@ void victory()
     Matrix projectionMatrix;
     Matrix viewMatrix;
     Matrix backgroundMatrix;
-    GLuint background = LoadTexture("/Images/screen1.png");
+    GLuint background = LoadTexture("/Images/screen3.jpg");
     
     projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
     glUseProgram(program.programID);

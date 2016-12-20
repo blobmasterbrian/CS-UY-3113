@@ -304,6 +304,8 @@ Player& Player::getInstance(string& type, float xCoordinate, float yCoordinate)
     static Player instance(type, xCoordinate, yCoordinate);
     instance.position.first = xCoordinate;
     instance.position.second = yCoordinate;
+    instance.velocity.first = 0.0f;
+    instance.velocity.second = 0.0f;
     instance.textureID = LoadTexture("/Images/characters_3.png");
     return instance;
 }
@@ -404,7 +406,7 @@ void Enemy::attack()
             index = 49;
             setSpriteCoords(index);
             velocity.first = 0.0f;
-        } else if (velocity.first == 0.0f && attack % 29 == 0) {
+        } else if (velocity.first == 0.0f && attack % 19 == 0) {
             acceleration.second = 20.0f;
             acceleration.first = 20.0f;
             velocity.first = 2.5f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (2.5f))));
