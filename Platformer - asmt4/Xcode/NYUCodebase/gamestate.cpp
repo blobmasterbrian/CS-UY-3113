@@ -124,8 +124,8 @@ bool Level::readEntityData(ifstream& input)
             getline(entityStream, xPosition, ',');
             getline(entityStream, yPosition, ',');
 
-            float placeX = static_cast<float>(stoi(xPosition) * tileSizeX * 0.1f);
-            float placeY = static_cast<float>(stoi(yPosition) * -tileSizeY * 0.1f);
+            float placeX = static_cast<float>(stoi(xPosition) * tileSizeX * 0.1f + TILE_SIZEX/2);
+            float placeY = static_cast<float>(stoi(yPosition) * -tileSizeY * 0.1f - TILE_SIZEY/2);
 
             placeEntity(type, placeX, placeY);
         }

@@ -365,14 +365,15 @@ void Enemy::attack()
             index = 10;
             setSpriteCoords(index);
             velocity.first = 0.0f;
-        } else if (velocity.first == 0.0f && attack % 53 == 0) {
+        }
+        if (velocity.first == 0.0f && attack % 17 == 0) {
             velocity.first = 1.0f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (1.0f))));
             if (rand()%2 == 0) {
                 velocity.first = -velocity.first;
             }
         }
     } else if (kind == EntityType::Bat) {
-        if (attack % 281 == 0 && position.second < initHeight && position.second > initHeight - 1.5f) {
+        if (attack % 149 == 0 && position.second < initHeight && position.second > initHeight - 1.5f) {
             index = 51;
             setSpriteCoords(index);
             
@@ -382,9 +383,10 @@ void Enemy::attack()
                 velocity.first -= 1.5f;
             }
             
-            velocity.second += -4.0f;
+            velocity.second += -5.0f;
             acceleration.second = 3.0f;
-        } else if (position.second >= initHeight) {
+        }
+        if (position.second >= initHeight) {
             if (fabs(velocity.first) > fabs(initSpeed)) {
                 if (velocity.first > 0.0f) {
                     velocity.first -= 1.5f;
@@ -406,7 +408,8 @@ void Enemy::attack()
             index = 49;
             setSpriteCoords(index);
             velocity.first = 0.0f;
-        } else if (velocity.first == 0.0f) {
+        }
+        if (velocity.first == 0.0f) {
             acceleration.second = 20.0f;
             acceleration.first = 20.0f;
             velocity.first = 2.5f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (2.5f))));

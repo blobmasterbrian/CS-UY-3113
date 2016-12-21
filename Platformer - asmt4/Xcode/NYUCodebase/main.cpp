@@ -311,6 +311,12 @@ void levelState(int lev)
                     }
                     level.player->setSpriteCoords(level.player->index);
                 }
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE && level.player->jump) {
+                    Mix_PlayChannel(-1, jump, 0);
+                    level.player->velocity.second = 15.0f;
+                    level.player->jump = false;
+                    level.player->index = 13;
+                }
             }
         }
         
