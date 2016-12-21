@@ -406,7 +406,7 @@ void Enemy::attack()
             index = 49;
             setSpriteCoords(index);
             velocity.first = 0.0f;
-        } else if (velocity.first == 0.0f && attack % 19 == 0) {
+        } else if (velocity.first == 0.0f) {
             acceleration.second = 20.0f;
             acceleration.first = 20.0f;
             velocity.first = 2.5f + static_cast<float>(rand())/(static_cast<float>(RAND_MAX/(5.0f - (2.5f))));

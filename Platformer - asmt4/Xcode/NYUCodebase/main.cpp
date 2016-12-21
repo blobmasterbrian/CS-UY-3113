@@ -271,6 +271,8 @@ void levelState(int lev)
     
 //createLevel:
     level.createMap(levelLoad[lev]);
+    level.player->velocity.first = 0.0f;
+    level.player->velocity.second = 0.0f;
 //    level.player->height = 1.5;
 //    level.player->width = 1.5;
 //    program.setViewMatrix(level.player->playerView);
@@ -338,6 +340,8 @@ void levelState(int lev)
                 fixedElapsed -= FIXED_TIMESTEP;
                 level.entities[i]->update(FIXED_TIMESTEP);
                 if (level.entities[i]->kind != EntityType::Player && level.entities[i]->collision(level.player)) {
+                    level.player->velocity.first = 0.0f;
+                    level.player->velocity.second = 0.0f;
                     state = GameState::GameOver;
                     done = true;
 //                    goto end;
@@ -349,11 +353,17 @@ void levelState(int lev)
                     if (level.levelData[y][x] == 3) {
                         done = true;
                         if (lev > 1) {
+                            level.player->velocity.first = 0.0f;
+                            level.player->velocity.second = 0.0f;
                             state = GameState::Win;
 //                            goto end;
                         } else if (lev == 0) {
+                            level.player->velocity.first = 0.0f;
+                            level.player->velocity.second = 0.0f;
                             state = GameState::Level2;
                         } else if (lev == 1) {
+                            level.player->velocity.first = 0.0f;
+                            level.player->velocity.second = 0.0f;
                             state = GameState::Level3;
                         }
 //                        goto end;
@@ -362,6 +372,8 @@ void levelState(int lev)
             }
             level.entities[i]->update(fixedElapsed);
             if (level.entities[i]->kind != EntityType::Player && level.entities[i]->collision(level.player)) {
+                level.player->velocity.first = 0.0f;
+                level.player->velocity.second = 0.0f;
                 state = GameState::GameOver;
                 done = true;
 //                goto end;
@@ -371,6 +383,8 @@ void levelState(int lev)
                 level.entities[i] = nullptr;
                 continue;
             } else if (level.entities[i]->kind == EntityType::Player && level.entities[i]->position.second < -TILE_SIZEY*(level.mapHeight-1)) {
+                level.player->velocity.first = 0.0f;
+                level.player->velocity.second = 0.0f;
                 state = GameState::GameOver;
                 done = true;
             }
@@ -478,6 +492,7 @@ void victory()
     Matrix viewMatrix;
     Matrix backgroundMatrix;
     GLuint background = LoadTexture("/Images/screen3.jpg");
+    GLuint font = LoadFontTexture("/Images/font2.png");
     
     projectionMatrix.setOrthoProjection(-45.0f, 45.0f, -26.5f, 26.5f, -1.0f, 1.0f);
     glUseProgram(program.programID);
@@ -501,6 +516,7 @@ void victory()
         glClear(GL_COLOR_BUFFER_BIT);
         
         drawBackground(&program, background, backgroundMatrix);
+        drawText(&program, font, "Congratulations!", 5.5f, -2.0f, -24.5f, -20.0f);
         
         program.setProjectionMatrix(projectionMatrix);
         program.setViewMatrix(viewMatrix);
@@ -556,7 +572,6 @@ void gameOver()
         }
         glClear(GL_COLOR_BUFFER_BIT);
         
-        drawBackground(&program, background, backgroundMatrix);
         drawBackground(&program, background, backgroundMatrix);
         drawText(&program, font, "Restart?", 3.5f, -1.0f, -8.0f, -22.0f);
         
